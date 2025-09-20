@@ -1,5 +1,3 @@
-bisa ga langsung  di docker filenya
-
 # Stage 1: Build assets
 FROM node:20-alpine AS builder
 
