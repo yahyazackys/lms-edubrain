@@ -12,13 +12,13 @@
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="flex flex-col space-y-1">
                                 <h1 class="text-lg font-semibold font-heading text-gray-900">Kartu Rencana Studi (KRS)</h1>
-                                <p class="text-xs text-gray-600">Kelola Kartu Rencana Studi Anda berdasarkan periode semester
+                                <p class="text-sm text-gray-600">Kelola Kartu Rencana Studi Anda berdasarkan periode semester
                                 </p>
                             </div>
                             <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                                <label class="text-xs font-medium text-gray-700">Pilih Periode Semester:</label>
+                                <label class="text-sm font-medium text-gray-700">Pilih Periode Semester:</label>
                                 <select id="semesterFilter" onchange="changeSemester()"
-                                    class="text-xs py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent min-w-[200px]">
+                                    class="text-sm py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent min-w-[200px]">
                                     <option value="">Pilih Semester</option>
                                     @foreach ($semesters as $semester)
                                         <option value="{{ $semester->id_semester }}"
@@ -50,7 +50,7 @@
                             <!-- Section kiri: Title -->
                             <div class="flex flex-col space-y-1">
                                 <h1 class="text-lg font-semibold font-heading text-gray-900">Kartu Rencana Studi (KRS)</h1>
-                                <p class="text-xs text-gray-600">Kelola Kartu Rencana Studi Anda berdasarkan periode
+                                <p class="text-sm text-gray-600">Kelola Kartu Rencana Studi Anda berdasarkan periode
                                     semester</p>
                             </div>
 
@@ -58,9 +58,9 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                                 <!-- Semester Selector -->
                                 <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                                    <label class="text-xs font-medium text-gray-700">Pilih Periode Semester:</label>
+                                    <label class="text-sm font-medium text-gray-700">Pilih Periode Semester:</label>
                                     <select id="semesterFilter" onchange="changeSemester()"
-                                        class="text-xs py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent min-w-[200px]">
+                                        class="text-sm py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent min-w-[200px]">
                                         <option value="">Pilih Semester</option>
                                         @foreach ($semesters as $semester)
                                             <option value="{{ $semester->id_semester }}"
@@ -94,7 +94,7 @@
 
                                     @if ($canEditKrs)
                                         <a href="{{ route('krs.pilih-mata-kuliah', $selectedSemester->id_semester) }}"
-                                            class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 whitespace-nowrap">
+                                            class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 whitespace-nowrap">
                                             @if ($hasRejectedCourses)
                                                 Pilih Mata Kuliah Pengganti
                                             @else
@@ -104,7 +104,7 @@
 
                                         @if ($mataKuliahTerpilih->count() > 0 && !$hasRejectedCourses)
                                             <a href="{{ route('krs.review', $selectedSemester->id_semester) }}"
-                                                class="inline-flex justify-center px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 whitespace-nowrap">
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 whitespace-nowrap">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -130,8 +130,8 @@
                                     </div>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-xs font-medium text-gray-900">{{ $mahasiswa->pengguna->nama }}</p>
-                                    <p class="text-xs text-gray-500">{{ $mahasiswa->nim }}</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ $mahasiswa->pengguna->nama }}</p>
+                                    <p class="text-sm text-gray-500">{{ $mahasiswa->nim }}</p>
                                 </div>
                             </div>
 
@@ -143,8 +143,8 @@
                                     </div>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-xs font-medium text-gray-900">Semester {{ $semesterMahasiswa }}</p>
-                                    <p class="text-xs text-gray-500">{{ $mahasiswa->programStudi->nama_program_studi }}</p>
+                                    <p class="text-sm font-medium text-gray-900">Semester {{ $semesterMahasiswa }}</p>
+                                    <p class="text-sm text-gray-500">{{ $mahasiswa->programStudi->nama_program_studi }}</p>
                                 </div>
                             </div>
 
@@ -156,11 +156,11 @@
                                     </div>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-xs font-medium text-gray-900">
+                                    <p class="text-sm font-medium text-gray-900">
                                         {{ $totalSksSelected }}/{{ $batasSks }}
                                         SKS
                                     </p>
-                                    <p class="text-xs text-gray-500">Total Dipilih</p>
+                                    <p class="text-sm text-gray-500">Total Dipilih</p>
                                 </div>
                             </div>
 
@@ -190,7 +190,7 @@
                                     </div>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-xs font-medium text-gray-900">
+                                    <p class="text-sm font-medium text-gray-900">
                                         @if ($registrasiKrs->status_krs === 'APPROVED')
                                             Disetujui
                                         @elseif($registrasiKrs->status_krs === 'REJECTED')
@@ -201,7 +201,7 @@
                                             Draft
                                         @endif
                                     </p>
-                                    <p class="text-xs text-gray-500">Status KRS</p>
+                                    <p class="text-sm text-gray-500">Status KRS</p>
                                 </div>
                             </div>
                         </div>
@@ -271,7 +271,7 @@
 
                                         <div class="mt-4 flex items-center space-x-3">
                                             <a href="{{ route('krs.pilih-mata-kuliah', $selectedSemester->id_semester) }}"
-                                                class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md shadow-sm text-xs font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -281,7 +281,7 @@
                                             </a>
 
                                             @if ($registrasiKrs->pembimbingAkademik)
-                                                <div class="text-xs text-red-600">
+                                                <div class="text-sm text-red-600">
                                                     <i class="fa-solid fa-user mr-1"></i>
                                                     PA:
                                                     {{ $registrasiKrs->pembimbingAkademik->dosen->pengguna->nama ?? 'N/A' }}
@@ -363,7 +363,7 @@
                         <div class="bg-white rounded-lg shadow-sm border border-gray-100">
                             <div class="px-6 py-4 border-b border-gray-100">
                                 <h3 class="text-sm font-semibold text-gray-900">Mata Kuliah Terpilih</h3>
-                                <p class="text-xs text-gray-500 mt-1">{{ $mataKuliahTerpilih->count() }} mata kuliah
+                                <p class="text-sm text-gray-500 mt-1">{{ $mataKuliahTerpilih->count() }} mata kuliah
                                     dipilih
                                 </p>
                             </div>
@@ -374,26 +374,26 @@
                                         <thead class="bg-gray-50">
                                             <tr>
                                                 <th
-                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     Mata Kuliah</th>
                                                 <th
-                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     Kelas</th>
                                                 <th
-                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     Dosen</th>
                                                 <th
-                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     Waktu</th>
                                                 <th
-                                                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     SKS</th>
                                                 <th
-                                                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    class="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                     Status</th>
                                                 @if (in_array($registrasiKrs->status_krs, ['SUBMITTED', 'REJECTED']))
                                                     <th
-                                                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        class="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
                                                         Aksi</th>
                                                 @endif
                                             </tr>
@@ -402,38 +402,38 @@
                                             @foreach ($mataKuliahTerpilih as $peserta)
                                                 <tr class="hover:bg-gray-50 transition-colors duration-200">
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-xs font-medium text-gray-900">
+                                                        <div class="text-sm font-medium text-gray-900">
                                                             {{ $peserta->mataKuliah->kode_mata_kuliah }}</div>
-                                                        <div class="text-xs text-gray-500 mt-1">
+                                                        <div class="text-sm text-gray-500 mt-1">
                                                             {{ $peserta->mataKuliah->nama_mata_kuliah }}</div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-xs font-medium text-gray-900">
+                                                        <div class="text-sm font-medium text-gray-900">
                                                             {{ $peserta->kelasKuliah->nama_kelas_kuliah }}</div>
-                                                        <div class="text-xs text-gray-500 mt-1">
+                                                        <div class="text-sm text-gray-500 mt-1">
                                                             {{ $peserta->kelasKuliah->nama_ruangan }}</div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-xs font-medium text-gray-900">
+                                                        <div class="text-sm font-medium text-gray-900">
                                                             {{ $peserta->kelasKuliah->dosen->pengguna->nama ?? 'N/A' }}
                                                         </div>
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         @if ($peserta->kelasKuliah->jam_mulai && $peserta->kelasKuliah->jam_akhir)
-                                                            <div class="text-xs font-medium text-gray-900">
+                                                            <div class="text-sm font-medium text-gray-900">
                                                                 {{ $peserta->kelasKuliah->hari }}</div>
-                                                            <div class="text-xs text-gray-500 mt-1">
+                                                            <div class="text-sm text-gray-500 mt-1">
                                                                 {{ \Carbon\Carbon::parse($peserta->kelasKuliah->jam_mulai)->format('H:i') }}
                                                                 -
                                                                 {{ \Carbon\Carbon::parse($peserta->kelasKuliah->jam_akhir)->format('H:i') }}
                                                             </div>
                                                         @else
-                                                            <span class="text-xs text-gray-400">Belum diatur</span>
+                                                            <span class="text-sm text-gray-400">Belum diatur</span>
                                                         @endif
                                                     </td>
                                                     <td class="px-6 py-4 text-center whitespace-nowrap">
                                                         <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                                                             {{ $peserta->mataKuliah->sks_mata_kuliah }} SKS
                                                         </span>
                                                     </td>
@@ -441,7 +441,7 @@
                                                         @switch($peserta->status_mata_kuliah)
                                                             @case('APPROVED')
                                                                 <span
-                                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                                                     <svg class="w-3 h-3 mr-1" fill="none"
                                                                         stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -453,7 +453,7 @@
 
                                                             @case('REJECTED')
                                                                 <span
-                                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
                                                                     <svg class="w-3 h-3 mr-1" fill="none"
                                                                         stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -467,7 +467,7 @@
 
                                                                 @default
                                                                     <span
-                                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
                                                                         <svg class="w-3 h-3 mr-1" fill="none"
                                                                             stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -515,7 +515,7 @@
                                             </svg>
                                             <p class="text-lg font-medium text-gray-900 mb-2">Belum Ada Mata Kuliah Terpilih
                                             </p>
-                                            <p class="text-xs text-gray-500 mb-4">Pilih mata kuliah untuk semester ini</p>
+                                            <p class="text-sm text-gray-500 mb-4">Pilih mata kuliah untuk semester ini</p>
                                         </div>
                                     @endif
                                 </div>
@@ -545,8 +545,8 @@
                                                     </div>
                                                     {{-- Text --}}
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="text-xs font-medium text-gray-900">KRS Dibuka</p>
-                                                        <p class="text-xs text-gray-500">
+                                                        <p class="text-sm font-medium text-gray-900">KRS Dibuka</p>
+                                                        <p class="text-sm text-gray-500">
                                                             {{ $registrasiKrs->created_at->format('d M Y H:i') }}
                                                         </p>
                                                     </div>
@@ -570,13 +570,13 @@
                                                         @endif
                                                     </div>
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="text-xs font-medium text-gray-900">Submit ke PA</p>
+                                                        <p class="text-sm font-medium text-gray-900">Submit ke PA</p>
                                                         @if ($registrasiKrs->tanggal_submit)
-                                                            <p class="text-xs text-gray-500">
+                                                            <p class="text-sm text-gray-500">
                                                                 {{ $registrasiKrs->tanggal_submit->format('d M Y H:i') }}
                                                             </p>
                                                         @else
-                                                            <p class="text-xs text-gray-400">Belum disubmit</p>
+                                                            <p class="text-sm text-gray-400">Belum disubmit</p>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -596,13 +596,13 @@
                                                         @endif
                                                     </div>
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="text-xs font-medium text-gray-900">Approval PA</p>
+                                                        <p class="text-sm font-medium text-gray-900">Approval PA</p>
                                                         @if ($registrasiKrs->tanggal_approval)
-                                                            <p class="text-xs text-gray-500">
+                                                            <p class="text-sm text-gray-500">
                                                                 {{ $registrasiKrs->tanggal_approval->format('d M Y H:i') }}
                                                             </p>
                                                         @else
-                                                            <p class="text-xs text-gray-400">Menunggu approval</p>
+                                                            <p class="text-sm text-gray-400">Menunggu approval</p>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -628,10 +628,10 @@
                                                 </div>
                                             </div>
                                             <div class="ml-3">
-                                                <p class="text-xs font-medium text-gray-900">
+                                                <p class="text-sm font-medium text-gray-900">
                                                     {{ $registrasiKrs->pembimbingAkademik->dosen->pengguna->nama ?? 'N/A' }}
                                                 </p>
-                                                <p class="text-xs text-gray-500">
+                                                <p class="text-sm text-gray-500">
                                                     {{ $registrasiKrs->pembimbingAkademik->dosen->nidn ?? 'N/A' }}
                                                 </p>
                                             </div>

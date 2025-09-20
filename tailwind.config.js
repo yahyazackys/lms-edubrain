@@ -13,6 +13,9 @@ export default {
 
     theme: {
         extend: {
+            fontSize: {
+                sm: ["13px", { lineHeight: "20px" }],
+            },
             colors: {
                 primary: {
                     50: "#eff6ff",
@@ -59,7 +62,8 @@ export default {
             },
 
             fontFamily: {
-                sans: ["Inter", ...defaultTheme.fontFamily.sans],
+                sans: ['"Public Sans"', ...defaultTheme.fontFamily.sans],
+                // sans: ["Inter", ...defaultTheme.fontFamily.sans],
                 heading: ["Poppins", ...defaultTheme.fontFamily.sans],
                 raleway: ["Raleway", ...defaultTheme.fontFamily.sans],
                 monserrat: ["Monserrat", ...defaultTheme.fontFamily.sans],

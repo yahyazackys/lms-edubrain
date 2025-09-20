@@ -43,7 +43,6 @@
                                         {{ $selectedSemesterId == $semester->id_semester ? 'selected' : '' }}
                                         data-active="{{ $semester->is_active ? '1' : '0' }}">
                                         {{ $semester->nama_semester }}
-                                        {{ $semester->is_active ? '(Aktif)' : '' }}
                                     </option>
                                 @endforeach
                             </select>

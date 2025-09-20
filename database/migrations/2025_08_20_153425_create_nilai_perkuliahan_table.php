@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Index untuk perhitungan IPK dan tracking kelulusan
-            $table->index(['nilai_indeks']);
+            $table->index(['nilai_indeks', 'nilai_huruf']);
         });
     }
 

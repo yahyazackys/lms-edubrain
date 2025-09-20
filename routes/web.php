@@ -16,6 +16,31 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // KHS & Transcript Routes
+    Route::prefix('akademik')->name('akademik.')->group(function () {
+        // Dashboard akademik
+        Route::get('/dashboard', [\App\Http\Controllers\KhsTranscriptController::class, 'dashboardAkademik'])
+            ->name('dashboard');
+
+        // KHS Routes
+        Route::prefix('khs')->name('khs.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\KhsTranscriptController::class, 'indexKhs'])
+                ->name('index');
+            Route::get('/show', [\App\Http\Controllers\KhsTranscriptController::class, 'showKhs'])
+                ->name('show');
+            Route::get('/download-pdf', [\App\Http\Controllers\KhsTranscriptController::class, 'downloadKhsPdf'])
+                ->name('download-pdf');
+        });
+
+        // Transcript Routes  
+        Route::prefix('transcript')->name('transcript.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\KhsTranscriptController::class, 'indexTranscript'])
+                ->name('index');
+            Route::get('/download-pdf', [\App\Http\Controllers\KhsTranscriptController::class, 'downloadTranscriptPdf'])
+                ->name('download-pdf');
+        });
+    });
+
     // Admin
     Route::middleware('role:admin')->group(function () {
         // Semester
@@ -331,6 +356,22 @@ Route::middleware('auth')->group(function () {
             Route::get('/pengumpulan-uts/{pengumpulanId}/download', [\App\Http\Controllers\Mahasiswa\DetailKelasController::class, 'downloadJawabanUts'])->name('download-pengumpulan-uts');
             Route::get('/pengumpulan-uas/{pengumpulanId}/download', [\App\Http\Controllers\Mahasiswa\DetailKelasController::class, 'downloadJawabanUas'])->name('download-pengumpulan-uas');
         });
+    });
+
+    // Routes untuk admin/dosen
+    Route::middleware('role:admin|dosen')->prefix('admin/akademik')->name('admin.akademik.')->group(function () {
+        Route::get('/cari-mahasiswa', [\App\Http\Controllers\KhsTranscriptController::class, 'cariMahasiswa'])
+            ->name('cari-mahasiswa');
+
+        // Akses data mahasiswa lain
+        Route::get('/khs/mahasiswa', [\App\Http\Controllers\KhsTranscriptController::class, 'indexKhs'])
+            ->name('khs.mahasiswa.index');
+        Route::get('/khs/mahasiswa/show', [\App\Http\Controllers\KhsTranscriptController::class, 'showKhs'])
+            ->name('khs.mahasiswa.show');
+        Route::get('/transcript/mahasiswa', [\App\Http\Controllers\KhsTranscriptController::class, 'indexTranscript'])
+            ->name('transcript.mahasiswa.index');
+        Route::get('/dashboard/mahasiswa', [\App\Http\Controllers\KhsTranscriptController::class, 'dashboardAkademik'])
+            ->name('dashboard.mahasiswa');
     });
 });
 

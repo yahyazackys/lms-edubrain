@@ -87,12 +87,7 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100">
                     <div class="px-6 py-12 text-center text-gray-500">
                         <div class="flex flex-col items-center">
-                            <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3a2 2 0 012-2h2a2 2 0 012 2v4m-4 0v14l4-4 4 4V7M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2">
-                                </path>
-                            </svg>
+                            <i class="fas fa-search w-16 h-16 text-gray-400 mb-4 mx-auto text-6xl"></i>
                             <p class="text-lg font-medium text-gray-900 mb-2">Pilih Periode Semester</p>
                             <p class="text-sm text-gray-500">Pilih periode semester terlebih dahulu untuk melihat data
                                 pembimbing akademik</p>

@@ -52,7 +52,7 @@
 <body x-data="{
     sidebarOpen: false,
     alerts: []
-}" class="font-monserrat antialiased bg-gray-50">
+}" class="font-sans antialiased bg-gray-50">
 
     <!-- Session Expired Modal -->
     <div id="sessionExpiredModal" class="fixed inset-0 z-[10001] overflow-y-auto hidden">

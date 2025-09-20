@@ -216,6 +216,15 @@
 
                             <span>Pembimbing Akademik</span>
                         </a>
+
+                        <a href="{{ route('admin.akademik.cari-mahasiswa') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                {{ request()->is('admin/akademik*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </span>
+                            <span>Data Akademik Mahasiswa</span>
+                        </a>
                     </div>
 
                     <!-- Kategori Perkuliahan -->
@@ -267,7 +276,31 @@
                                 <i class="fa-solid fa-book-open"></i>
                             </span>
 
-                            <span>KRS</span>
+                            <span>Kartu Rencana Studi</span>
+                        </a>
+
+                        <a href="{{ route('akademik.khs.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('akademik/khs*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+
+                            <!-- Icon wrapper -->
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-book-open"></i>
+                            </span>
+
+                            <span>Kartu Hasil Studi</span>
+                        </a>
+
+                        <a href="{{ route('akademik.transcript.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('akademik/transcript*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+
+                            <!-- Icon wrapper -->
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-book-open"></i>
+                            </span>
+
+                            <span>Transkrip</span>
                         </a>
                     </div>
 
