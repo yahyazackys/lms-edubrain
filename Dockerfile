@@ -5,13 +5,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package.json dulu supaya npm cache efisien
 COPY package*.json ./
 RUN npm install
 
-# Copy semua source (kecuali yg di .dockerignore)
 COPY . .
-
 RUN npm run build
 
 
@@ -38,16 +35,23 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy Laravel source (kecuali node_modules, vendor, dll)
+# Set Composer safe mode
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_MEMORY_LIMIT=-1
+
+# Copy composer files dulu
+COPY composer.json composer.lock ./
+
+# Install dependencies Laravel (tanpa vendor)
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Copy seluruh source code
 COPY . .
 
 # Copy hasil build frontend
 COPY --from=builder /app/public/build ./public/build
 
-# Install dependencies Laravel
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
-# Set permissions (supaya storage & cache bisa ditulis)
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
  && chmod -R 755 /var/www/html/storage \
  && chmod -R 755 /var/www/html/bootstrap/cache
