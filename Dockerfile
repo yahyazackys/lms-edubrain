@@ -31,7 +31,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Copy build hasil dari Node stage
-COPY --from=build /app/public/build ./public/build
+COPY --from=builder /app/public/build ./public/build
 
 # Install dependencies Laravel
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
