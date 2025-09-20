@@ -43,7 +43,7 @@ ENV COMPOSER_MEMORY_LIMIT=-1
 COPY composer.json composer.lock ./
 
 # Install dependencies Laravel (tanpa vendor)
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader -vvv
+RUN composer install --no-dev
 
 # Copy seluruh source code
 COPY . .
