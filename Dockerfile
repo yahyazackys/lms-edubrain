@@ -40,10 +40,7 @@ COPY . .
 COPY --from=builder /var/www/html/public/build ./public/build
 
 # Install dependencies Laravel
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
- && php artisan config:clear \
- && php artisan cache:clear \
- && php artisan route:clear
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 EXPOSE 9000
 CMD ["php-fpm"]
