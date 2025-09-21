@@ -272,130 +272,136 @@
                 </div>
             @endrole
         </div>
-    </div>
 
-    <!-- Create/Edit Modal -->
-    @role('admin')
-        <div id="pengumumanModal" class="fixed inset-0 z-[9999] overflow-y-auto hidden">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeModal()"></div>
 
-                <div
-                    class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-4xl mx-auto">
-                    <form id="pengumumanForm" method="POST" action="{{ route('pengumuman.store') }}"
-                        enctype="multipart/form-data">
-                        @csrf
+        <!-- Create/Edit Modal -->
+        @role('admin')
+            <div id="pengumumanModal" class="fixed inset-0 z-[9999] overflow-y-auto hidden">
+                <div class="flex items-center justify-center min-h-screen p-4">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeModal()"></div>
 
-                        <div class="bg-white px-4 sm:px-6 pt-6 pb-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 id="modalTitle" class="text-lg font-heading font-semibold text-gray-900">
-                                    Tambah Pengumuman
-                                </h3>
-                                <button type="button" onclick="closeModal()"
-                                    class="sm:hidden text-gray-400 hover:text-gray-600">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
+                    <div
+                        class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-4xl mx-auto">
+                        <form id="pengumumanForm" method="POST" action="{{ route('pengumuman.store') }}"
+                            enctype="multipart/form-data">
+                            @csrf
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">
-                                        Judul Pengumuman <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text" name="judul" id="judul"
-                                        class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                        placeholder="Masukkan judul pengumuman" maxlength="255" required>
+                            <div class="bg-white px-4 sm:px-6 pt-6 pb-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 id="modalTitle" class="text-lg font-heading font-semibold text-gray-900">
+                                        Tambah Pengumuman
+                                    </h3>
+                                    <button type="button" onclick="closeModal()"
+                                        class="sm:hidden text-gray-400 hover:text-gray-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">
-                                        Tujuan <span class="text-red-500">*</span>
-                                    </label>
-                                    <select name="tujuan" id="tujuan" required
-                                        class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
-                                        <option value="">Pilih Tujuan</option>
-                                        <option value="mahasiswa">Mahasiswa</option>
-                                        <option value="dosen">Dosen</option>
-                                        <option value="umum">Umum</option>
-                                    </select>
-                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-2">
+                                            Judul Pengumuman <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="judul" id="judul"
+                                            class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                            placeholder="Masukkan judul pengumuman" maxlength="255" required>
+                                    </div>
 
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">
-                                        Dokumen Pendukung
-                                    </label>
-                                    <input type="file" name="dokumen" id="dokumen" accept=".pdf,.doc,.docx,.ppt,.pptx"
-                                        class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100">
-                                    <p class="mt-1 text-xs text-gray-500">
-                                        PDF, DOC, DOCX, PPT, PPTX (Max: 5MB)
-                                    </p>
-                                    <div id="currentFile" class="mt-2 hidden">
-                                        <p class="text-xs text-gray-600">File saat ini: <span id="currentFileName"></span></p>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-2">
+                                            Tujuan <span class="text-red-500">*</span>
+                                        </label>
+                                        <select name="tujuan" id="tujuan" required
+                                            class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+                                            <option value="">Pilih Tujuan</option>
+                                            <option value="mahasiswa">Mahasiswa</option>
+                                            <option value="dosen">Dosen</option>
+                                            <option value="umum">Umum</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-2">
+                                            Dokumen Pendukung
+                                        </label>
+                                        <input type="file" name="dokumen" id="dokumen"
+                                            accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                            class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100">
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            PDF, DOC, DOCX, PPT, PPTX (Max: 5MB)
+                                        </p>
+                                        <div id="currentFile" class="mt-2 hidden">
+                                            <p class="text-xs text-gray-600">File saat ini: <span id="currentFileName"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-2">
+                                            Deskripsi <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea name="deskripsi" id="deskripsi" rows="8"
+                                            class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                            placeholder="Masukkan deskripsi pengumuman" required></textarea>
                                     </div>
                                 </div>
-
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">
-                                        Deskripsi <span class="text-red-500">*</span>
-                                    </label>
-                                    <textarea name="deskripsi" id="deskripsi" rows="8"
-                                        class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                        placeholder="Masukkan deskripsi pengumuman" required></textarea>
-                                </div>
                             </div>
-                        </div>
 
-                        <div
-                            class="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-                            <button type="button" onclick="closeModal()"
-                                class="w-full sm:w-auto inline-flex justify-center px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                class="w-full sm:w-auto inline-flex justify-center px-4 py-2 text-xs font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900">
-                                <span id="submitText">Simpan</span>
-                            </button>
-                        </div>
-                    </form>
+                            <div
+                                class="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                                <button type="button" onclick="closeModal()"
+                                    class="w-full sm:w-auto inline-flex justify-center px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900">
+                                    Batal
+                                </button>
+                                <button type="submit"
+                                    class="w-full sm:w-auto inline-flex justify-center px-4 py-2 text-xs font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900">
+                                    <span id="submitText">Simpan</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endrole
+        @endrole
 
-    <!-- Detail Modal -->
-    <div id="detailModal" class="fixed inset-0 z-[9999] overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeDetailModal()"></div>
+        <!-- Detail Modal -->
+        <div id="detailModal" class="fixed inset-0 z-[9999] overflow-y-auto hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeDetailModal()">
+                </div>
 
-            <div
-                class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
-                <div class="bg-white px-4 sm:px-6 pt-6 pb-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-heading font-semibold text-gray-900">Detail Pengumuman</h3>
-                        <button type="button" onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                <div
+                    class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
+                    <div class="bg-white px-4 sm:px-6 pt-6 pb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-heading font-semibold text-gray-900">Detail Pengumuman</h3>
+                            <button type="button" onclick="closeDetailModal()"
+                                class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div id="detailContent" class="space-y-4">
+                            <!-- Content will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-4 sm:px-6 py-4 flex justify-end">
+                        <button type="button" onclick="closeDetailModal()"
+                            class="px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Tutup
                         </button>
                     </div>
-
-                    <div id="detailContent" class="space-y-4">
-                        <!-- Content will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 px-4 sm:px-6 py-4 flex justify-end">
-                    <button type="button" onclick="closeDetailModal()"
-                        class="px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                        Tutup
-                    </button>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Hidden Forms -->
@@ -603,27 +609,27 @@
                         </div>
 
                         ${pengumuman.dokumen ? `
-                                            <div class="bg-gray-50 rounded-lg p-4">
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center space-x-3">
-                                                        <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                                            </svg>
-                                                        </div>
-                                                        <div>
-                                                            <p class="font-medium text-gray-900 text-sm">Dokumen Pendukung</p>
-                                                            <p class="text-sm text-gray-600">${pengumuman.dokumen.split('/').pop()}</p>
+                                                    <div class="bg-gray-50 rounded-lg p-4">
+                                                        <div class="flex items-center justify-between">
+                                                            <div class="flex items-center space-x-3">
+                                                                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                                    </svg>
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-medium text-gray-900 text-sm">Dokumen Pendukung</p>
+                                                                    <p class="text-sm text-gray-600">${pengumuman.dokumen.split('/').pop()}</p>
+                                                                </div>
+                                                            </div>
+                                                            <a href="/pengumuman/${pengumuman.id}/download" target="_blank"
+                                                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                                                Download
+                                                            </a>
                                                         </div>
                                                     </div>
-                                                    <a href="/pengumuman/${pengumuman.id}/download" target="_blank"
-                                                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                                        Download
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        ` : ''}
+                                                ` : ''}
                     </div>
                 `;
 
@@ -663,7 +669,7 @@
                             e.preventDefault();
                             alert(
                                 `Field ${field.previousElementSibling.textContent.replace(' *', '')} tidak boleh kosong`
-                                );
+                            );
                             field.focus();
                             return false;
                         }
