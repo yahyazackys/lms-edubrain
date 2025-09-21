@@ -75,7 +75,7 @@
                 <!-- Desktop Table View -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100">
                     <div class="overflow-x-auto">
-                        <table class="w-full table-fixed divide-y divide-gray-200" id="pengumumanTable">
+                        <table class="min-w-full divide-y divide-gray-200" id="pengumumanTable">
                             <colgroup>
                                 <col class="w-2/5"> <!-- Judul -->
                                 <col class="w-1/6"> <!-- Tujuan -->
@@ -106,7 +106,7 @@
                                 @forelse($pengumuman as $item)
                                     <tr class="hover:bg-gray-50 transition-colors duration-200 pengumuman-row" data-searchable
                                         data-tujuan="{{ $item->tujuan }}">
-                                        <td class="px-6 py-4">
+                                        <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="searchable-judul">
                                                 <div class="text-xs font-medium text-gray-900">
                                                     {{ $item->judul }}
@@ -272,7 +272,6 @@
                 </div>
             @endrole
         </div>
-
 
         <!-- Create/Edit Modal -->
         @role('admin')
@@ -609,27 +608,27 @@
                         </div>
 
                         ${pengumuman.dokumen ? `
-                                                    <div class="bg-gray-50 rounded-lg p-4">
-                                                        <div class="flex items-center justify-between">
-                                                            <div class="flex items-center space-x-3">
-                                                                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                                                    </svg>
-                                                                </div>
-                                                                <div>
-                                                                    <p class="font-medium text-gray-900 text-sm">Dokumen Pendukung</p>
-                                                                    <p class="text-sm text-gray-600">${pengumuman.dokumen.split('/').pop()}</p>
-                                                                </div>
-                                                            </div>
-                                                            <a href="/pengumuman/${pengumuman.id}/download" target="_blank"
-                                                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                                                Download
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                ` : ''}
+                                                                            <div class="bg-gray-50 rounded-lg p-4">
+                                                                                <div class="flex items-center justify-between">
+                                                                                    <div class="flex items-center space-x-3">
+                                                                                        <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <p class="font-medium text-gray-900 text-sm">Dokumen Pendukung</p>
+                                                                                            <p class="text-sm text-gray-600">${pengumuman.dokumen.split('/').pop()}</p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <a href="/pengumuman/${pengumuman.id}/download" target="_blank"
+                                                                                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        ` : ''}
                     </div>
                 `;
 
