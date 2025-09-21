@@ -14,7 +14,9 @@ use App\Models\{
     Kurikulum,
     MataKuliah,
     Mahasiswa,
-    Dosen
+    Dosen,
+    KalenderAkademik,
+    Pengumuman
 };
 use Illuminate\Support\Facades\DB;
 
@@ -428,6 +430,86 @@ class DatabaseSeeder extends Seeder
 
         foreach ($kelasKuliah as $kelas) {
             $this->command->info("{$kelas->kode_mata_kuliah} ({$kelas->nama_kelas_kuliah}) - {$kelas->hari} {$kelas->jam_mulai}-{$kelas->jam_akhir} - {$kelas->nama_ruangan} - {$kelas->nama_dosen}");
+        }
+
+        $pengumuman = [
+            [
+                'judul' => 'Perkuliahan Semester Ganjil 2025/2026',
+                'deskripsi' => 'Perkuliahan semester ganjil Tahun Akademik 2025/2026 akan dimulai pada tanggal 1 September 2025. Mahasiswa diminta melakukan KRS online sebelum tanggal 30 Agustus 2025.',
+                'tujuan' => 'mahasiswa',
+            ],
+            [
+                'judul' => 'Pendaftaran Wisuda Periode Desember 2025',
+                'deskripsi' => 'Pendaftaran wisuda untuk periode Desember 2025 telah dibuka. Mahasiswa yang telah memenuhi syarat kelulusan dapat melakukan pendaftaran melalui portal akademik.',
+                'tujuan' => 'mahasiswa',
+            ],
+            [
+                'judul' => 'Workshop Metodologi Penelitian',
+                'deskripsi' => 'Dosen diharapkan mengikuti workshop metodologi penelitian yang akan diselenggarakan pada tanggal 15 Oktober 2025 di Aula Rektorat.',
+                'tujuan' => 'dosen',
+            ],
+            [
+                'judul' => 'Pengumuman Cuti Bersama dan Libur Nasional',
+                'deskripsi' => 'Sehubungan dengan perayaan Hari Raya Natal dan Tahun Baru, kegiatan akademik akan diliburkan pada tanggal 24 Desember 2025 hingga 2 Januari 2026.',
+                'tujuan' => 'umum',
+            ],
+            [
+                'judul' => 'Penerimaan Beasiswa Prestasi',
+                'deskripsi' => 'Universitas membuka pendaftaran Beasiswa Prestasi bagi mahasiswa aktif yang memiliki IPK minimal 3.50. Pendaftaran dibuka hingga 10 November 2025.',
+                'tujuan' => 'mahasiswa',
+            ],
+            [
+                'judul' => 'Rapat Senat Akademik',
+                'deskripsi' => 'Diberitahukan kepada seluruh anggota senat bahwa rapat senat akademik akan dilaksanakan pada tanggal 5 November 2025 pukul 09.00 WIB di Ruang Senat.',
+                'tujuan' => 'dosen',
+            ],
+        ];
+
+        foreach ($pengumuman as $item) {
+            Pengumuman::create($item);
+        }
+
+        $kalender = [
+            [
+                'judul' => 'Awal Perkuliahan Semester Ganjil 2025/2026',
+                'tanggal_mulai' => '2025-09-01',
+                'tanggal_selesai' => '2025-09-01',
+                'is_all_day' => true,
+            ],
+            [
+                'judul' => 'Orientasi Mahasiswa Baru',
+                'tanggal_mulai' => '2025-09-02',
+                'tanggal_selesai' => '2025-09-04',
+                'is_all_day' => true,
+            ],
+            [
+                'judul' => 'Batas Akhir Perubahan KRS',
+                'tanggal_mulai' => '2025-09-10',
+                'tanggal_selesai' => '2025-09-10',
+                'is_all_day' => true,
+            ],
+            [
+                'judul' => 'Pembekalan Kuliah Kerja Nyata (KKN)',
+                'tanggal_mulai' => '2025-09-15',
+                'tanggal_selesai' => '2025-09-16',
+                'is_all_day' => true,
+            ],
+            [
+                'judul' => 'Libur Maulid Nabi Muhammad SAW',
+                'tanggal_mulai' => '2025-09-17',
+                'tanggal_selesai' => '2025-09-17',
+                'is_all_day' => true,
+            ],
+            [
+                'judul' => 'Pelaksanaan Seminar Proposal',
+                'tanggal_mulai' => '2025-09-25',
+                'tanggal_selesai' => '2025-09-26',
+                'is_all_day' => true,
+            ],
+        ];
+
+        foreach ($kalender as $item) {
+            KalenderAkademik::create($item);
         }
     }
 }

@@ -93,288 +93,254 @@
 
         <!-- Navigation Menu -->
         <div class="flex-1 px-4 py-4 lg:py-12 overflow-y-auto">
-            @role('admin')
-                <div class="space-y-6">
+            <div class="space-y-6">
+                <!-- Dashboard - Universal -->
+                <div class="space-y-2">
+                    <a href="{{ route('dashboard') }}"
+                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                {{ request()->is('dashboard*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                        <span class="flex items-center justify-center w-5 h-5 mr-3">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Informasi Umum - Universal untuk semua role -->
+                <div class="space-y-2">
+                    <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Informasi</h3>
+
+                    <a href="{{ route('kalender-akademik.index') }}"
+                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                        {{ request()->is('kalender-akademik*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                        <span class="flex items-center justify-center w-5 h-5 mr-3">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </span>
+                        <span>Kalender Akademik</span>
+                    </a>
+
+                    <a href="{{ route('pengumuman.index') }}"
+                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                        {{ request()->is('pengumuman*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                        <span class="flex items-center justify-center w-5 h-5 mr-3">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </span>
+                        <span>Pengumuman</span>
+                    </a>
+
+                    <a href=""
+                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+   hover:bg-gray-50 hover:text-gray-900 font-medium">
+                        <span class="flex items-center justify-center w-5 h-5 mr-3">
+                            <i class="fa-solid fa-book"></i>
+                        </span>
+                        <span>E-Library</span>
+                    </a>
+
+                    <a href=""
+                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+   hover:bg-gray-50 hover:text-gray-900 font-medium">
+                        <span class="flex items-center justify-center w-5 h-5 mr-3">
+                            <i class="fa-solid fa-newspaper"></i>
+                        </span>
+                        <span>E-Journal</span>
+                    </a>
+
+                </div>
+
+                <!-- Menu Khusus Admin -->
+                @hasrole('admin')
+                    <!-- Data Master -->
                     <div class="space-y-2">
-                        <!-- Dashboard -->
-                        <a href="{{ route('dashboard') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
-                    {{ request()->is('dashboard*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                        <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Pengguna</h3>
 
-                            <!-- Icon wrapper -->
-                            <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-chart-simple"></i>
-                            </span>
-
-                            <span>Dashboard</span>
-                        </a>
-
-                        <!-- Mahasiswa -->
                         <a href="{{ route('mahasiswa.index') }}"
                             class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                     {{ request()->is('mahasiswa*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-chart-simple"></i>
+                                <i class="fa-solid fa-user-graduate"></i>
                             </span>
-
                             <span>Mahasiswa</span>
                         </a>
 
-                        <!-- Dosen -->
                         <a href="{{ route('dosen.index') }}"
                             class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                     {{ request()->is('dosen*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-chart-simple"></i>
+                                <i class="fa-solid fa-chalkboard-teacher"></i>
                             </span>
-
                             <span>Dosen</span>
                         </a>
                     </div>
 
-                    <!-- Kategori Referensi -->
+                    <!-- Referensi -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Referensi</h3>
 
                         <a href="{{ route('semester.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('semester') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
                                 <i class="fa-solid fa-calendar-alt"></i>
                             </span>
-
                             <span>Semester</span>
                         </a>
 
                         <a href="{{ route('jenjang.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('jenjang') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
                                 <i class="fa-solid fa-graduation-cap"></i>
                             </span>
-
                             <span>Jenjang Pendidikan</span>
                         </a>
                     </div>
 
-                    <!-- Kategori Akademik -->
+                    <!-- Akademik -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Akademik</h3>
 
                         <a href="{{ route('program-studi.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('program-studi') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-building-columns"></i>
                             </span>
-
                             <span>Program Studi</span>
                         </a>
 
                         <a href="{{ route('mata-kuliah.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('mata-kuliah') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-book"></i>
                             </span>
-
                             <span>Mata Kuliah</span>
                         </a>
 
                         <a href="{{ route('kurikulum.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('kurikulum*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
                                 <i class="fa-solid fa-clipboard-list"></i>
                             </span>
-
                             <span>Kurikulum</span>
                         </a>
 
                         <a href="{{ route('pembimbing-akademik.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('pembimbing-akademik*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-clipboard-list"></i>
+                                <i class="fa-solid fa-user-tie"></i>
                             </span>
-
                             <span>Pembimbing Akademik</span>
                         </a>
 
                         <a href="{{ route('admin.akademik.cari-mahasiswa') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                 {{ request()->is('admin/akademik*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-graduation-cap"></i>
+                                <i class="fa-solid fa-search"></i>
                             </span>
                             <span>Data Akademik Mahasiswa</span>
                         </a>
                     </div>
 
-                    <!-- Kategori Perkuliahan -->
+                    <!-- Perkuliahan -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Perkuliahan</h3>
 
                         <a href="{{ route('kelas-kuliah.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('kelas-kuliah') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-chalkboard"></i>
                             </span>
-
                             <span>Kelas Perkuliahan</span>
                         </a>
                     </div>
-                </div>
-            @endrole
+                @endhasrole
 
-            @role('mahasiswa')
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <!-- Dashboard -->
-                        <a href="{{ route('dashboard') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
-                    {{ request()->is('dashboard*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
-                            <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-chart-simple"></i>
-                            </span>
-
-                            <span>Dashboard</span>
-                        </a>
-                    </div>
-
-                    <!-- Kategori Akademik -->
+                <!-- Menu Khusus Mahasiswa -->
+                @hasrole('mahasiswa')
+                    <!-- Akademik -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Akademik</h3>
 
                         <a href="{{ route('krs.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('krs') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-clipboard-check"></i>
                             </span>
-
                             <span>Kartu Rencana Studi</span>
                         </a>
 
                         <a href="{{ route('akademik.khs.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('akademik/khs*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-file-alt"></i>
                             </span>
-
                             <span>Kartu Hasil Studi</span>
                         </a>
 
                         <a href="{{ route('akademik.transcript.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('akademik/transcript*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-scroll"></i>
                             </span>
-
                             <span>Transkrip</span>
                         </a>
                     </div>
 
-                    <!-- Kategori Perkuliahan -->
+                    <!-- Perkuliahan -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Perkuliahan</h3>
 
                         <a href="{{ route('jadwal-kuliah.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('jadwal-kuliah*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-calendar-week"></i>
                             </span>
-
                             <span>Jadwal Kuliah</span>
                         </a>
                     </div>
-                </div>
-            @endrole
+                @endhasrole
 
-            @role('dosen')
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <!-- Dashboard -->
-                        <a href="{{ route('dashboard') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
-                    {{ request()->is('dashboard*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
-                            <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-chart-simple"></i>
-                            </span>
-
-                            <span>Dashboard</span>
-                        </a>
-                    </div>
-
-                    <!-- Kategori Akademik -->
+                <!-- Menu Khusus Dosen -->
+                @hasrole('dosen')
+                    <!-- Akademik -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Akademik</h3>
 
                         <a href="{{ route('krs.approval.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('krs*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-clipboard-check"></i>
                             </span>
-
-                            <span>KRS</span>
+                            <span>Persetujuan KRS</span>
                         </a>
                     </div>
 
-                    <!-- Kategori Perkuliahan -->
+                    <!-- Perkuliahan -->
                     <div class="space-y-2">
                         <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wide">Perkuliahan</h3>
 
                         <a href="{{ route('jadwal-mengajar.index') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-gray-700  rounded-xl transition-all duration-200 hover:no-underline relative
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('jadwal-mengajar*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-
-                            <!-- Icon wrapper -->
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-book-open"></i>
+                                <i class="fa-solid fa-chalkboard-teacher"></i>
                             </span>
-
                             <span>Jadwal Mengajar</span>
                         </a>
                     </div>
-                </div>
-            @endrole
+                @endhasrole
+            </div>
         </div>
     </nav>
 

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KalenderAkademikController;
+use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -7,9 +10,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,6 +41,14 @@ Route::middleware('auth')->group(function () {
                 ->name('download-pdf');
         });
     });
+
+    // Daftar Kalender Akademik
+    Route::get('kalender-akademik/events', [KalenderAkademikController::class, 'getEvents'])->name('kalender-akademik.events');
+    Route::get('kalender-akademik', [KalenderAkademikController::class, 'index'])->name('kalender-akademik.index');
+
+    // Daftar pengumuman
+    Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/{pengumuman}/download', [PengumumanController::class, 'streamFile'])->name('pengumuman.download');
 
     // Admin
     Route::middleware('role:admin')->group(function () {
@@ -164,6 +173,7 @@ Route::middleware('auth')->group(function () {
             });
         });
 
+        // Kelas Kuliah
         Route::prefix('kelas-kuliah')->name('kelas-kuliah.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\KelasKuliahController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\KelasKuliahController::class, 'store'])->name('store');
@@ -184,6 +194,7 @@ Route::middleware('auth')->group(function () {
             });
         });
 
+        // Pembimbing Akademik
         Route::prefix('pembimbing-akademik')->name('pembimbing-akademik.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\PembimbingAkademikController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\PembimbingAkademikController::class, 'store'])->name('store');
@@ -215,6 +226,28 @@ Route::middleware('auth')->group(function () {
             // Export Laporan
             Route::get('/export', [\App\Http\Controllers\Admin\KrsAdminController::class, 'export'])->name('export');
         });
+
+        // Kalender Akademik
+        Route::prefix('kalender-akademik')
+            ->name('kalender-akademik.')
+            ->controller(KalenderAkademikController::class)
+            ->group(function () {
+                Route::get('create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
+                Route::get('{kalenderAkademik}/edit', 'edit')->name('edit');
+                Route::put('{kalenderAkademik}', 'update')->name('update');
+                Route::delete('{kalenderAkademik}', 'destroy')->name('destroy');
+            });
+
+        // Pengumuman
+        Route::prefix('pengumuman')
+            ->name('pengumuman.')
+            ->controller(PengumumanController::class)
+            ->group(function () {
+                Route::post('/', 'store')->name('store');
+                Route::put('{pengumuman}', 'update')->name('update');
+                Route::delete('{pengumuman}', 'destroy')->name('destroy');
+            });
     });
 
     Route::middleware(['role:mahasiswa'])->group(function () {

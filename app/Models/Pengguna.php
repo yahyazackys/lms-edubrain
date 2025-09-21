@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @method bool hasAnyRole(...$roles)
+ * @method bool hasRole(string|array|\Spatie\Permission\Contracts\Role $roles)
+ * @method bool hasPermissionTo(string|int|\Spatie\Permission\Contracts\Permission $permission, $guardName = null)
+ */
+
 class Pengguna extends Authenticatable
 {
     use HasFactory, Notifiable, HasUuids, HasRoles;
