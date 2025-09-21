@@ -36,7 +36,7 @@
             {{-- Logo & Brand --}}
             <div class="text-center">
                 <div
-                    class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-white backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                     <i class="fas fa-graduation-cap text-gray-900 text-2xl sm:text-3xl"></i>
                 </div>
                 <h1 class="font-heading text-xl sm:text-2xl font-semibold text-white mb-2 drop-shadow-lg">Edubrain Technology
@@ -45,7 +45,7 @@
             </div>
 
             {{-- Login Box --}}
-            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
+            <div class="bg-white backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
                 {{-- Status Session --}}
                 @if (session('status'))
                     <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm mb-6">
