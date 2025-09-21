@@ -3,20 +3,49 @@
 @section('title', 'Login')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div class="max-w-sm sm:max-w-md w-full space-y-8">
+    {{-- Custom Styles untuk Background Image --}}
+    <style>
+        .bg-university {
+            background-image: url('{{ asset('edubrain-university.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .bg-university::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            /* Overlay gelap untuk readability */
+            z-index: 1;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+
+    <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-university">
+        <div class="max-w-sm sm:max-w-md w-full space-y-8 content-overlay">
             {{-- Logo & Brand --}}
             <div class="text-center">
                 <div
-                    class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gray-900 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                    <i class="fas fa-graduation-cap text-white text-2xl sm:text-3xl"></i>
+                    class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-graduation-cap text-gray-900 text-2xl sm:text-3xl"></i>
                 </div>
-                <h1 class="font-heading text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Edubrain Technology</h1>
-                <p class="text-sm text-gray-500">Sistem Informasi Akademik</p>
+                <h1 class="font-heading text-xl sm:text-2xl font-semibold text-white mb-2 drop-shadow-lg">Edubrain Technology
+                </h1>
+                <p class="text-sm text-gray-200 drop-shadow">Sistem Informasi Akademik</p>
             </div>
 
             {{-- Login Box --}}
-            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100">
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-xl border border-white/20">
                 {{-- Status Session --}}
                 @if (session('status'))
                     <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm mb-6">
@@ -78,7 +107,7 @@
             </div>
 
             {{-- Footer --}}
-            <div class="text-center text-xs sm:text-sm text-gray-400">
+            <div class="text-center text-xs sm:text-sm text-gray-200 drop-shadow">
                 <p>&copy; {{ now()->year }} Edubrain. All rights reserved.</p>
             </div>
         </div>
