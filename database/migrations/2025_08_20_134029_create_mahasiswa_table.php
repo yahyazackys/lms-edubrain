@@ -11,6 +11,8 @@ return new class extends Migration
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->uuid('id_mahasiswa')->primary();
 
+            $table->string('foto')->nullable();
+
             // Biodata Mahasiswa
             $table->string('nim', 20)->unique();
             $table->enum('jenis_kelamin', ['L', 'P']);

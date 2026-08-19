@@ -52,7 +52,7 @@ class DosenController extends Controller
             });
         }
 
-        $dosens = $query->orderBy('nidn')->paginate(10);
+        $dosens = $query->orderBy('nidn')->get();
 
         // Data untuk filter dropdown
         $programStudis = ProgramStudi::with('jenjang')
@@ -358,44 +358,108 @@ class DosenController extends Controller
     }
 
     /**
-     * Export template Excel untuk import
+     * Export template Excel untuk import (data wajib saja)
      */
     public function exportTemplate()
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header kolom
+        // Header kolom (hanya data wajib)
         $headers = [
-            'NIDN', 'Nama', 'Jenis Kelamin (L/P)', 'Tempat Lahir', 'Tanggal Lahir (YYYY-MM-DD)',
-            'Status Dosen (AKTIF/CUTI/KELUAR/NONAKTIF/PENSIUN)', 'Status Kepegawaian (PNS/CPNS/P3K/TETAP/KONTRAK/HONORER)',
-            'Gelar Depan', 'Gelar Belakang', 'NIK (16 digit)', 'NPWP', 'Email', 'No HP',
+            'NIDN',
+            'Nama Lengkap',
+            'Jenis Kelamin (L/P)',
             'Kode Program Studi',
-            'Jalan', 'Dusun', 'RT', 'RW', 'Kelurahan', 'Kode Pos'
+            'Status Dosen',
+            'Status Kepegawaian'
         ];
 
-        // Set header
+        // Set header dengan styling
         $column = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
             $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE0E0E0');
             $sheet->getColumnDimension($column)->setAutoSize(true);
             $column++;
         }
 
-        // Data contoh
+        // FORMAT KOLOM NIDN (A) SEBAGAI TEXT - INI YANG PENTING
+        $sheet->getStyle('A:A')
+            ->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Data contoh dengan explicit text format
         $exampleData = [
-            '0123456789', 'Dr. John Doe', 'L', 'Jakarta', '1980-01-01',
-            'AKTIF', 'TETAP', 'Dr.', 'M.T.', '1234567890123456', '123456789012345',
-            'john.doe@example.com', '081234567890', 'TI',
-            'Jl. Sudirman No. 1', 'Kebon Jeruk', '01', '02', 'Kebon Jeruk', '12345'
+            ['0123456789', 'Dr. John Doe', 'L', 'TI', 'AKTIF', 'TETAP'],
+            ['0987654321', 'Dr. Jane Smith', 'P', 'SI', 'AKTIF', 'PNS'],
+            ['0020012345', 'Prof. Ahmad Ibrahim', 'L', 'IF', 'AKTIF', 'PNS'],
         ];
 
-        $column = 'A';
+        $row = 2;
         foreach ($exampleData as $data) {
-            $sheet->setCellValue($column . '2', $data);
-            $column++;
+            // Set NIDN sebagai string explicit dengan setValueExplicit
+            $sheet->setCellValueExplicit('A' . $row, $data[0], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+            // Kolom lainnya normal
+            $column = 'B';
+            for ($i = 1; $i < count($data); $i++) {
+                $sheet->setCellValue($column . $row, $data[$i]);
+                $column++;
+            }
+            $row++;
         }
+
+        // Instruksi di sheet kedua
+        $instructionSheet = $spreadsheet->createSheet();
+        $instructionSheet->setTitle('Instruksi');
+
+        $instructions = [
+            ['PETUNJUK PENGISIAN TEMPLATE IMPORT DOSEN'],
+            [''],
+            ['Kolom yang wajib diisi:'],
+            ['1. NIDN - Nomor Induk Dosen Nasional (contoh: 0123456789)'],
+            ['   PENTING: Kolom NIDN sudah diformat sebagai TEXT'],
+            ['   Jika angka 0 di depan hilang, ketik tanda petik (\') dulu sebelum NIDN'],
+            ['   Contoh: \'002001 akan tetap menjadi 002001'],
+            [''],
+            ['2. Nama Lengkap - Nama lengkap dosen tanpa gelar'],
+            ['3. Jenis Kelamin - L untuk Laki-laki, P untuk Perempuan'],
+            ['4. Kode Program Studi - Kode program studi (contoh: TI, SI, IF)'],
+            ['5. Status Dosen - Pilihan: AKTIF, CUTI, KELUAR, NONAKTIF, PENSIUN'],
+            ['6. Status Kepegawaian - Pilihan: PNS, CPNS, P3K, TETAP, KONTRAK, HONORER'],
+            [''],
+            ['PENTING:'],
+            ['- Username dan password akan dibuat otomatis menggunakan NIDN'],
+            ['- Kode Program Studi harus sesuai dengan data di sistem'],
+            ['- Jika kode program studi tidak ditemukan, baris akan dilewati'],
+            ['- Data yang error akan dilaporkan setelah import'],
+            [''],
+            ['TIPS EXCEL:'],
+            ['- Kolom NIDN sudah diformat sebagai TEXT otomatis'],
+            ['- Jika tetap bermasalah, ketik apostrof (\') sebelum angka'],
+            ['- Contoh: \'0020012345'],
+            [''],
+            ['JANGAN LUPA HAPUS INSTRUKSI KETIKA IMPORT DATA'],
+        ];
+
+        $row = 1;
+        foreach ($instructions as $instruction) {
+            $instructionSheet->setCellValue('A' . $row, $instruction[0]);
+            if ($row == 1) {
+                $instructionSheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(14);
+            } elseif (strpos($instruction[0], 'PENTING') !== false || strpos($instruction[0], 'TIPS') !== false) {
+                $instructionSheet->getStyle('A' . $row)->getFont()->setBold(true);
+            }
+            $row++;
+        }
+        $instructionSheet->getColumnDimension('A')->setWidth(80);
+
+        // Set active sheet kembali ke sheet pertama
+        $spreadsheet->setActiveSheetIndex(0);
 
         $filename = 'template_import_dosen_' . date('Y-m-d') . '.xlsx';
 
@@ -408,9 +472,6 @@ class DosenController extends Controller
         exit;
     }
 
-    /**
-     * Import dosen dari Excel
-     */
     public function import(Request $request): RedirectResponse
     {
         $request->validate([
@@ -423,63 +484,92 @@ class DosenController extends Controller
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
 
-            // Skip header row
-            array_shift($rows);
+            array_shift($rows); // Skip header
 
             $importedCount = 0;
+            $skippedCount = 0;
             $errors = [];
 
             DB::beginTransaction();
 
             foreach ($rows as $index => $row) {
-                $rowNumber = $index + 2; // +2 karena index mulai dari 0 dan ada header
+                $rowNumber = $index + 2;
 
-                // Skip empty rows
                 if (empty(array_filter($row))) {
                     continue;
                 }
 
                 try {
-                    // Validasi data wajib
-                    if (empty($row[0])) {
+                    $nidn = trim((string)($row[0] ?? ''));
+                    $nama = trim($row[1] ?? '');
+                    $jenisKelamin = strtoupper(trim($row[2] ?? ''));
+                    $kodeProdi = trim($row[3] ?? '');
+                    $statusDosen = strtoupper(trim($row[4] ?? ''));
+                    $statusKepegawaian = strtoupper(trim($row[5] ?? ''));
+
+                    // Validasi NIDN
+                    if (empty($nidn)) {
                         $errors[] = "Baris {$rowNumber}: NIDN tidak boleh kosong";
+                        $skippedCount++;
                         continue;
                     }
 
-                    if (empty($row[1])) {
+                    // Validasi Nama
+                    if (empty($nama)) {
                         $errors[] = "Baris {$rowNumber}: Nama tidak boleh kosong";
+                        $skippedCount++;
                         continue;
                     }
 
-                    if (empty($row[2]) || !in_array($row[2], ['L', 'P'])) {
+                    // Validasi Jenis Kelamin
+                    if (!in_array($jenisKelamin, ['L', 'P'])) {
                         $errors[] = "Baris {$rowNumber}: Jenis kelamin harus L atau P";
+                        $skippedCount++;
                         continue;
                     }
 
-                    // Cek program studi berdasarkan kode (jika diisi)
-                    $programStudi = null;
-                    if (!empty($row[13])) {
-                        $programStudi = ProgramStudi::where('kode_program_studi', $row[13])->first();
-                        if (!$programStudi) {
-                            $errors[] = "Baris {$rowNumber}: Kode program studi '{$row[13]}' tidak ditemukan";
-                            continue;
-                        }
+                    // Validasi Status Dosen
+                    if (!in_array($statusDosen, ['AKTIF', 'CUTI', 'KELUAR', 'NONAKTIF', 'PENSIUN'])) {
+                        $errors[] = "Baris {$rowNumber}: Status dosen tidak valid (harus: AKTIF, CUTI, KELUAR, NONAKTIF, atau PENSIUN)";
+                        $skippedCount++;
+                        continue;
+                    }
+
+                    // Validasi Status Kepegawaian
+                    if (!in_array($statusKepegawaian, ['PNS', 'CPNS', 'P3K', 'TETAP', 'KONTRAK', 'HONORER'])) {
+                        $errors[] = "Baris {$rowNumber}: Status kepegawaian tidak valid (harus: PNS, CPNS, P3K, TETAP, KONTRAK, atau HONORER)";
+                        $skippedCount++;
+                        continue;
                     }
 
                     // Cek duplikasi NIDN
-                    if (Dosen::where('nidn', $row[0])->exists()) {
-                        $errors[] = "Baris {$rowNumber}: NIDN '{$row[0]}' sudah terdaftar";
+                    if (Dosen::where('nidn', $nidn)->exists()) {
+                        $errors[] = "Baris {$rowNumber}: NIDN '{$nidn}' sudah terdaftar";
+                        $skippedCount++;
                         continue;
+                    }
+
+                    // Cari program studi
+                    $programStudiId = null;
+                    if (!empty($kodeProdi)) {
+                        $programStudi = ProgramStudi::where('kode_program_studi', $kodeProdi)
+                            ->where('status', 'A')
+                            ->first();
+
+                        if (!$programStudi) {
+                            $errors[] = "Baris {$rowNumber}: Kode program studi '{$kodeProdi}' tidak ditemukan";
+                            $skippedCount++;
+                            continue;
+                        }
+                        $programStudiId = $programStudi->id_program_studi;
                     }
 
                     // Buat akun pengguna
                     $pengguna = Pengguna::create([
                         'id_pengguna' => (string) Str::uuid(),
-                        'nama' => $row[1],
-                        'username' => $row[0],
-                        'password' => Hash::make($row[0]),
-                        'email' => !empty($row[11]) ? $row[11] : null,
-                        'no_hp' => !empty($row[12]) ? $row[12] : null,
+                        'nama' => $nama,
+                        'username' => $nidn,
+                        'password' => Hash::make($nidn),
                         'role' => 'dosen',
                         'is_active' => true,
                     ]);
@@ -487,52 +577,156 @@ class DosenController extends Controller
                     // Buat data dosen
                     Dosen::create([
                         'id_dosen' => (string) Str::uuid(),
-                        'nidn' => $row[0],
-                        'jenis_kelamin' => $row[2],
-                        'tempat_lahir' => !empty($row[3]) ? $row[3] : null,
-                        'tanggal_lahir' => !empty($row[4]) ? date('Y-m-d', strtotime($row[4])) : null,
-                        'status_dosen' => !empty($row[5]) && in_array($row[5], ['AKTIF', 'CUTI', 'KELUAR', 'NONAKTIF', 'PENSIUN']) ? $row[5] : 'AKTIF',
-                        'status_kepegawaian' => !empty($row[6]) && in_array($row[6], ['PNS', 'CPNS', 'P3K', 'TETAP', 'KONTRAK', 'HONORER']) ? $row[6] : 'TETAP',
-                        'gelar_depan' => !empty($row[7]) ? $row[7] : null,
-                        'gelar_belakang' => !empty($row[8]) ? $row[8] : null,
-                        'nik' => !empty($row[9]) && strlen($row[9]) == 16 ? $row[9] : null,
-                        'npwp' => !empty($row[10]) ? $row[10] : null,
-                        'id_program_studi' => $programStudi ? $programStudi->id_program_studi : null,
+                        'nidn' => $nidn,
+                        'jenis_kelamin' => $jenisKelamin,
+                        'status_dosen' => $statusDosen,
+                        'status_kepegawaian' => $statusKepegawaian,
+                        'id_program_studi' => $programStudiId,
                         'id_pengguna' => $pengguna->id_pengguna,
-
-                        // Alamat
-                        'jalan' => !empty($row[14]) ? $row[14] : null,
-                        'dusun' => !empty($row[15]) ? $row[15] : null,
-                        'rt' => !empty($row[16]) ? $row[16] : null,
-                        'rw' => !empty($row[17]) ? $row[17] : null,
-                        'kelurahan' => !empty($row[18]) ? $row[18] : null,
-                        'kode_pos' => !empty($row[19]) ? $row[19] : null,
                     ]);
 
                     $importedCount++;
                 } catch (\Exception $e) {
                     $errors[] = "Baris {$rowNumber}: " . $e->getMessage();
+                    $skippedCount++;
                 }
             }
 
-            if (empty($errors)) {
-                DB::commit();
+            DB::commit();
+
+            // Handle hasil import
+            if ($importedCount > 0 && empty($errors)) {
                 return redirect()->route('dosen.index')
                     ->with('success', "Berhasil mengimpor {$importedCount} data dosen.");
-            } else {
-                DB::rollback();
-                $errorMessage = "Import gagal. Kesalahan:\n" . implode("\n", array_slice($errors, 0, 10));
-                if (count($errors) > 10) {
-                    $errorMessage .= "\ndan " . (count($errors) - 10) . " kesalahan lainnya...";
-                }
-                return redirect()->route('dosen.index')
-                    ->with('error', $errorMessage);
             }
+
+            if ($importedCount > 0 && !empty($errors)) {
+                // GUNAKAN request()->session() untuk menghindari warning Intelephense
+                $request->session()->flash('import_errors', $errors);
+
+                return redirect()->route('dosen.index')
+                    ->with('warning', "Berhasil mengimpor {$importedCount} data dosen. {$skippedCount} data dilewati. Klik untuk melihat detail error.");
+            }
+
+            if ($importedCount === 0 && !empty($errors)) {
+                $request->session()->flash('import_errors', $errors);
+
+                return redirect()->route('dosen.index')
+                    ->with('error', 'Import gagal. Tidak ada data yang berhasil diimpor. Klik untuk melihat detail error.');
+            }
+
+            return redirect()->route('dosen.index')
+                ->with('info', 'Tidak ada data yang diimpor. File mungkin kosong.');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('dosen.index')
                 ->with('error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Export semua data dosen ke Excel
+     */
+    public function export()
+    {
+        $dosens = Dosen::with(['pengguna', 'programStudi.jenjang'])->orderBy('nidn')->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data Dosen');
+
+        // Header kolom (semua data)
+        $headers = [
+            'NIDN',
+            'Nama Lengkap',
+            'Gelar Depan',
+            'Gelar Belakang',
+            'Jenis Kelamin',
+            'Tempat Lahir',
+            'Tanggal Lahir',
+            'NIK',
+            'NPWP',
+            'Email',
+            'No HP',
+            'Program Studi',
+            'Jenjang',
+            'Status Dosen',
+            'Status Kepegawaian',
+            'Alamat Jalan',
+            'Dusun',
+            'RT',
+            'RW',
+            'Kelurahan',
+            'Kode Pos',
+            'Total Kuota PA',
+            'Username',
+            'Status Akun'
+        ];
+
+        // Set header dengan styling
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE0E0E0');
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+            $column++;
+        }
+
+        // Data dosen
+        $row = 2;
+        foreach ($dosens as $dosen) {
+            $data = [
+                $dosen->nidn,
+                $dosen->pengguna->nama,
+                $dosen->gelar_depan ?? '',
+                $dosen->gelar_belakang ?? '',
+                $dosen->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+                $dosen->tempat_lahir ?? '',
+                $dosen->tanggal_lahir ?? '',
+                $dosen->nik ?? '',
+                $dosen->npwp ?? '',
+                $dosen->pengguna->email ?? '',
+                $dosen->pengguna->no_hp ?? '',
+                $dosen->programStudi->nama_program_studi ?? '',
+                $dosen->programStudi->jenjang->nama_jenjang_pendidikan ?? '',
+                $dosen->status_dosen,
+                $dosen->status_kepegawaian,
+                $dosen->jalan ?? '',
+                $dosen->dusun ?? '',
+                $dosen->rt ?? '',
+                $dosen->rw ?? '',
+                $dosen->kelurahan ?? '',
+                $dosen->kode_pos ?? '',
+                $dosen->total_kuota_pa ?? 0,
+                $dosen->pengguna->username,
+                $dosen->pengguna->is_active ? 'Aktif' : 'Tidak Aktif'
+            ];
+
+            $column = 'A';
+            foreach ($data as $value) {
+                $sheet->setCellValue($column . $row, $value);
+                $column++;
+            }
+            $row++;
+        }
+
+        // Auto-size columns
+        foreach (range('A', $sheet->getHighestColumn()) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'data_dosen_' . date('Y-m-d_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
     /**

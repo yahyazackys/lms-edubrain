@@ -10,7 +10,7 @@
                 <div class="px-6 py-4">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h1 class="text-lg font-semibold text-slate-900">Kalender Akademik</h1>
+                            <h1 class="text-lg font-semibold font-heading text-slate-900">Kalender Akademik</h1>
                             <p class="text-xs text-slate-600 mt-1">
                                 @role('admin')
                                     Kelola jadwal kegiatan akademik

@@ -21,7 +21,7 @@ class PembimbingAkademikController extends Controller
     public function index(Request $request): View
     {
         // Semester options for dropdown
-        $semesters = Semester::orderBy('id_semester', 'desc')->get();
+        $semesters = Semester::orderBy('kode_semester', 'desc')->get();
         $selectedSemester = null;
         $mahasiswas = collect();
         $angkatans = collect();

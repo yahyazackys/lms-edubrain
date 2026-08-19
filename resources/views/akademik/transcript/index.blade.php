@@ -17,6 +17,7 @@
 
                         <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                             <a href="{{ route('akademik.transcript.download-pdf', request()->only('mahasiswa_id')) }}"
+                                target="_blank"
                                 class="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
                                 <i class="fas fa-file-pdf w-3 h-3 mr-2"></i>
                                 Download PDF

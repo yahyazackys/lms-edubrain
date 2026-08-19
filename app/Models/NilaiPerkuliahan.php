@@ -15,7 +15,9 @@ class NilaiPerkuliahan extends Model
 
     protected $fillable = [
         'id_nilai_perkuliahan',
+        'jenis_peserta',
         'id_peserta',
+        'id_peserta_bimbingan',
         'nilai_angka',
         'nilai_indeks',
         'nilai_huruf'
@@ -23,15 +25,24 @@ class NilaiPerkuliahan extends Model
 
     protected $casts = [
         'nilai_angka' => 'decimal:2',
-        'nilai_indeks' => 'decimal:2'
+        'nilai_indeks' => 'decimal:2',
+        'jenis_peserta' => 'string'
     ];
 
     /**
-     * Relasi ke Peserta Kelas Kuliah
+     * Relasi ke Peserta Kelas Kuliah (untuk mata kuliah reguler)
      */
     public function pesertaKelasKuliah(): BelongsTo
     {
         return $this->belongsTo(PesertaKelasKuliah::class, 'id_peserta', 'id_peserta');
+    }
+
+    /**
+     * Relasi ke Peserta Bimbingan (untuk mata kuliah bimbingan)
+     */
+    public function pesertaBimbingan(): BelongsTo
+    {
+        return $this->belongsTo(PesertaBimbingan::class, 'id_peserta_bimbingan', 'id_peserta_bimbingan');
     }
 
     /**
@@ -73,8 +84,16 @@ class NilaiPerkuliahan extends Model
      */
     public function scopeBySemester($query, $semesterId)
     {
-        return $query->whereHas('pesertaKelasKuliah.kelasKuliah', function ($q) use ($semesterId) {
-            $q->where('id_semester', $semesterId);
+        return $query->where(function ($q) use ($semesterId) {
+            $q->where('jenis_peserta', 'KELAS')
+                ->whereHas('pesertaKelasKuliah.kelasKuliah', function ($subQ) use ($semesterId) {
+                    $subQ->where('id_semester', $semesterId);
+                });
+        })->orWhere(function ($q) use ($semesterId) {
+            $q->where('jenis_peserta', 'BIMBINGAN')
+                ->whereHas('pesertaBimbingan.registrasiMahasiswa', function ($subQ) use ($semesterId) {
+                    $subQ->where('id_semester', $semesterId);
+                });
         });
     }
 
@@ -83,8 +102,16 @@ class NilaiPerkuliahan extends Model
      */
     public function scopeByMahasiswa($query, $mahasiswaId)
     {
-        return $query->whereHas('pesertaKelasKuliah.registrasiMahasiswa', function ($q) use ($mahasiswaId) {
-            $q->where('id_mahasiswa', $mahasiswaId);
+        return $query->where(function ($q) use ($mahasiswaId) {
+            $q->where('jenis_peserta', 'KELAS')
+                ->whereHas('pesertaKelasKuliah.registrasiMahasiswa', function ($subQ) use ($mahasiswaId) {
+                    $subQ->where('id_mahasiswa', $mahasiswaId);
+                });
+        })->orWhere(function ($q) use ($mahasiswaId) {
+            $q->where('jenis_peserta', 'BIMBINGAN')
+                ->whereHas('pesertaBimbingan.registrasiMahasiswa', function ($subQ) use ($mahasiswaId) {
+                    $subQ->where('id_mahasiswa', $mahasiswaId);
+                });
         });
     }
 }

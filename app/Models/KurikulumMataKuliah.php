@@ -20,7 +20,7 @@ class KurikulumMataKuliah extends Model
         'id_kurikulum',
         'id_mata_kuliah',
         'semester',
-        'jenis_mata_kuliah',
+        'kategori_mata_kuliah',
     ];
 
     // Relasi ke Kurikulum

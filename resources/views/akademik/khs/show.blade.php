@@ -18,7 +18,7 @@
                         </div>
 
                         <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                            <a href="{{ route('akademik.khs.download-pdf', array_merge(request()->all())) }}"
+                            <a href="{{ route('akademik.khs.download-pdf', array_merge(request()->all())) }}" target="_blank"
                                 class="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
                                 <i class="fas fa-file-pdf w-3 h-3 mr-2"></i>
                                 Download PDF
@@ -104,9 +104,11 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Jenis</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nilai</th>
+                                    Nilai Angka</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Indeks</th>
+                                    Nilai Huruf</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nilai Indeks</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Mutu</th>
                             </tr>
@@ -131,45 +133,83 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if ($mk['jenis'] == 'WAJIB')
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                Wajib
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                Pilihan
-                                            </span>
-                                        @endif
+                                        @switch($mk['jenis'])
+                                            @case('TEORI')
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <i class="fas fa-book mr-1"></i>
+                                                    Teori
+                                                </span>
+                                            @break
+
+                                            @case('PRAKTIKUM')
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    <i class="fas fa-flask mr-1"></i>
+                                                    Praktikum
+                                                </span>
+                                            @break
+
+                                            @case('KKN')
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                    <i class="fas fa-users mr-1"></i>
+                                                    KKN
+                                                </span>
+                                            @break
+
+                                            @case('MAGANG')
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                    <i class="fas fa-briefcase mr-1"></i>
+                                                    Magang
+                                                </span>
+                                            @break
+
+                                            @case('SKRIPSI')
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <i class="fas fa-graduation-cap mr-1"></i>
+                                                    Skripsi
+                                                </span>
+                                            @break
+
+                                            @default
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                    {{ $mk['jenis'] }}
+                                                </span>
+                                        @endswitch
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="text-xs font-semibold
-                                        ">{{ $mk['nilai_huruf'] }}</span>
+                                        <span class="text-xs font-semibold">{{ $mk['nilai_angka'] }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-xs font-semibold">{{ $mk['nilai_huruf'] }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                         {{ number_format($mk['nilai_indeks'], 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                         {{ number_format($mk['mutu'], 2) }}</td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center">
-                                        <div class="flex flex-col items-center">
-                                            <div class="w-12 h-12 text-gray-400 mb-4">
-                                                <i class="fas fa-file-alt text-4xl"></i>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <div class="w-12 h-12 text-gray-400 mb-4">
+                                                    <i class="fas fa-file-alt text-4xl"></i>
+                                                </div>
+                                                <p class="text-lg font-medium text-gray-900 mb-2">Tidak ada data</p>
+                                                <p class="text-sm text-gray-500">Belum ada nilai mata kuliah untuk semester ini
+                                                </p>
                                             </div>
-                                            <p class="text-lg font-medium text-gray-900 mb-2">Tidak ada data</p>
-                                            <p class="text-sm text-gray-500">Belum ada mata kuliah untuk semester ini</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@endsection
+    @endsection

@@ -14,21 +14,35 @@
                             <p class="text-sm text-gray-600">Kelola data mahasiswa dan akun pengguna</p>
                         </div>
 
-                        <div class="mt-4 sm:mt-0 flex space-x-3">
-                            <!-- Import Excel Button -->
-                            <button onclick="openImportModal()"
-                                class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
-                                    </path>
-                                </svg>
-                                Import Excel
-                            </button>
+                        <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+                            <!-- Import & Export Container -->
+                            <div class="flex space-x-3">
+                                <!-- Import Excel Button -->
+                                <button onclick="openImportModal()"
+                                    class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
+                                        </path>
+                                    </svg>
+                                    Import Excel
+                                </button>
+
+                                <!-- Export Excel Button -->
+                                <a href="{{ route('mahasiswa.export') }}"
+                                    class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
+                                    </svg>
+                                    Export Excel
+                                </a>
+                            </div>
 
                             <!-- Download Template Button -->
                             <a href="{{ route('mahasiswa.export-template') }}"
-                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -39,7 +53,7 @@
 
                             <!-- Add Student Button -->
                             <button onclick="openModal('create')"
-                                class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                                class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -297,19 +311,28 @@
                     </table>
                 </div>
 
-                <!-- Pagination Info (Static - tidak berubah karena filter realtime) -->
-                @if ($mahasiswas->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="text-xs text-gray-700">
-                                Menampilkan data mahasiswa (filter realtime)
-                            </div>
-                            <div class="text-xs text-gray-500">
-                                Total: {{ $mahasiswas->total() }} mahasiswa
-                            </div>
+                <!-- Client-Side Pagination Controls -->
+                <div id="pagination-container"
+                    class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                    <!-- Info pagination -->
+                    <div class="flex items-center text-xs text-gray-500">
+                        <span id="pagination-info">Menampilkan 0 dari 0 data</span>
+                        <div class="ml-4 flex items-center space-x-2">
+                            <label for="items-per-page" class="text-xs">Per halaman:</label>
+                            <select id="items-per-page" class="text-xs border border-gray-300 rounded py-1">
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
                         </div>
                     </div>
-                @endif
+
+                    <!-- Pagination buttons -->
+                    <div class="flex items-center space-x-1" id="pagination-buttons">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -520,8 +543,10 @@
                                         <div>
                                             <p class="text-xs font-medium text-yellow-800 mb-1">Penting!</p>
                                             <ul class="text-xs text-yellow-700 space-y-1">
-                                                <li>• Pastikan format file sesuai dengan template Excel</li>
-                                                <li>• Username dan password akan dibuat otomatis sesuai NIM</li>
+                                                <li>• Download template Excel terlebih dahulu</li>
+                                                <li>• Isi data sesuai format yang ada di template</li>
+                                                <li>• Username dan password otomatis = NIM</li>
+                                                <li>• Kode Program Studi harus sesuai dengan data di sistem</li>
                                                 <li>• Data yang error akan dilewati dan dilaporkan</li>
                                             </ul>
                                         </div>
@@ -545,6 +570,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- Import Error Modal -->
+        @if (session('import_errors'))
+            <div id="import-error-modal" class="fixed inset-0 z-[9999] overflow-y-auto">
+                <div class="flex items-center justify-center min-h-screen p-4">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeErrorModal()">
+                    </div>
+
+                    <div
+                        class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-2xl mx-auto">
+                        <div class="bg-white px-4 sm:px-6 pt-6 pb-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.966-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-lg font-heading font-semibold text-gray-900">
+                                        Detail Error Import
+                                    </h3>
+                                </div>
+                                <button type="button" onclick="closeErrorModal()"
+                                    class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="max-h-96 overflow-y-auto">
+                                <div class="space-y-2">
+                                    @foreach (session('import_errors') as $error)
+                                        <div class="flex items-start p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <p class="text-sm text-yellow-800">{{ $error }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 px-4 sm:px-6 py-4 flex justify-end">
+                            <button type="button" onclick="closeErrorModal()"
+                                class="inline-flex justify-center px-4 py-2 text-xs font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <!-- Hidden Forms -->
@@ -599,6 +685,9 @@
                 let visibleCount = 0;
 
                 rows.forEach(row => {
+                    // Reset pagination attribute
+                    row.removeAttribute('data-pagination-hidden');
+
                     const nim = row.getAttribute('data-nim').toLowerCase();
                     const nama = row.getAttribute('data-nama').toLowerCase();
                     const programStudi = row.getAttribute('data-program-studi');
@@ -626,6 +715,11 @@
                 });
 
                 updateEmptyState(visibleCount, searchTerm, programStudiFilter, angkatanFilter, statusFilter);
+
+                // Update pagination setelah filter
+                if (window.pagination) {
+                    window.pagination.onFilterChange();
+                }
             }
 
             // Update empty state
@@ -685,7 +779,7 @@
             }
 
             // Load kurikulum berdasarkan program studi
-            function loadKurikulumData(programStudiId) {
+            function loadKurikulumData(programStudiId, selectedKurikulumId = null) {
                 if (!programStudiId) {
                     document.getElementById('id_kurikulum').innerHTML = '<option value="">Pilih kurikulum...</option>';
                     return;
@@ -698,8 +792,10 @@
                         kurikulumSelect.innerHTML = '<option value="">Pilih kurikulum...</option>';
 
                         data.forEach(kurikulum => {
+                            const isSelected = selectedKurikulumId && kurikulum.id_kurikulum ===
+                                selectedKurikulumId ? 'selected' : '';
                             kurikulumSelect.innerHTML +=
-                                `<option value="${kurikulum.id_kurikulum}">${kurikulum.display_name}</option>`;
+                                `<option value="${kurikulum.id_kurikulum}" ${isSelected}>${kurikulum.display_name}</option>`;
                         });
                     })
                     .catch(error => {
@@ -776,12 +872,7 @@
                             updateClearButton();
 
                             // Load kurikulum dan set selected
-                            loadKurikulumData(programStudiId);
-                            setTimeout(() => {
-                                if (kurikulumId) {
-                                    document.getElementById('id_kurikulum').value = kurikulumId;
-                                }
-                            }, 500);
+                            loadKurikulumData(programStudiId, kurikulumId);
                         }
                     }
 
@@ -805,6 +896,22 @@
                 document.getElementById('importModal').classList.add('hidden');
                 document.getElementById('importForm').reset();
             }
+
+            // Error modal functions
+            function closeErrorModal() {
+                const modal = document.getElementById('import-error-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Show error modal if exists
+            document.addEventListener('DOMContentLoaded', function() {
+                const errorModal = document.getElementById('import-error-modal');
+                if (errorModal) {
+                    errorModal.style.display = 'block';
+                }
+            });
 
             // Delete function
             function confirmDelete(id, nama, nim) {
@@ -994,7 +1101,207 @@
                 if (event.key === 'Escape') {
                     closeModal();
                     closeImportModal();
+                    closeErrorModal();
                 }
+            });
+
+            // ============================================
+            // CLIENT-SIDE PAGINATION FUNCTIONALITY
+            // ============================================
+
+            class ClientPagination {
+                constructor() {
+                    this.currentPage = 1;
+                    this.itemsPerPage = 10;
+                    this.totalItems = 0;
+                    this.visibleItems = [];
+                    this.allRows = [];
+
+                    this.init();
+                }
+
+                init() {
+                    const itemsPerPageSelect = document.getElementById('items-per-page');
+                    if (itemsPerPageSelect) {
+                        itemsPerPageSelect.addEventListener('change', (e) => {
+                            this.itemsPerPage = parseInt(e.target.value);
+                            this.currentPage = 1;
+                            this.updatePagination();
+                        });
+                    }
+
+                    setTimeout(() => {
+                        this.updatePagination();
+                    }, 100);
+                }
+
+                updateRowsData() {
+                    const tbody = document.getElementById('mahasiswaTableBody');
+                    if (!tbody) return;
+
+                    this.allRows = Array.from(tbody.querySelectorAll('tr[data-searchable]'));
+                    this.updateVisibleRows();
+                }
+
+                updateVisibleRows() {
+                    this.visibleItems = this.allRows.filter(row => {
+                        const isHiddenByFilter = row.style.display === 'none' && !row.hasAttribute(
+                            'data-pagination-hidden');
+                        return !isHiddenByFilter;
+                    });
+                    this.totalItems = this.visibleItems.length;
+                }
+
+                updatePagination() {
+                    this.updateRowsData();
+
+                    const paginationContainer = document.getElementById('pagination-container');
+                    if (!paginationContainer) return;
+
+                    if (this.totalItems === 0) {
+                        paginationContainer.style.display = 'none';
+                        return;
+                    } else {
+                        paginationContainer.style.display = 'flex';
+                    }
+
+                    const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+
+                    if (this.currentPage > totalPages) {
+                        this.currentPage = Math.max(1, totalPages);
+                    }
+
+                    this.showPageItems();
+                    this.updatePaginationInfo();
+                    this.updatePaginationButtons(totalPages);
+                }
+
+                showPageItems() {
+                    if (this.visibleItems.length === 0) return;
+
+                    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                    const endIndex = startIndex + this.itemsPerPage;
+
+                    this.visibleItems.forEach(row => {
+                        row.removeAttribute('data-pagination-hidden');
+                        row.style.display = '';
+                    });
+
+                    this.visibleItems.forEach((row, index) => {
+                        if (index < startIndex || index >= endIndex) {
+                            row.style.display = 'none';
+                            row.setAttribute('data-pagination-hidden', 'true');
+                        }
+                    });
+                }
+
+                updatePaginationInfo() {
+                    const paginationInfo = document.getElementById('pagination-info');
+                    if (!paginationInfo) return;
+
+                    const startItem = this.totalItems === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+                    const endItem = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+
+                    paginationInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${this.totalItems} data`;
+                }
+
+                updatePaginationButtons(totalPages) {
+                    const container = document.getElementById('pagination-buttons');
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    if (totalPages <= 1) return;
+
+                    // Previous button
+                    const prevBtn = this.createPaginationButton('Sebelumnya', this.currentPage > 1, () => {
+                        if (this.currentPage > 1) {
+                            this.currentPage--;
+                            this.updatePagination();
+                        }
+                    });
+                    container.appendChild(prevBtn);
+
+                    // Page number buttons
+                    const startPage = Math.max(1, this.currentPage - 2);
+                    const endPage = Math.min(totalPages, this.currentPage + 2);
+
+                    // First page if not in range
+                    if (startPage > 1) {
+                        container.appendChild(this.createPaginationButton('1', true, () => {
+                            this.currentPage = 1;
+                            this.updatePagination();
+                        }));
+
+                        if (startPage > 2) {
+                            container.appendChild(this.createPaginationButton('...', false));
+                        }
+                    }
+
+                    // Page numbers
+                    for (let i = startPage; i <= endPage; i++) {
+                        const isActive = i === this.currentPage;
+                        container.appendChild(this.createPaginationButton(i.toString(), true, () => {
+                            this.currentPage = i;
+                            this.updatePagination();
+                        }, isActive));
+                    }
+
+                    // Last page if not in range
+                    if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) {
+                            container.appendChild(this.createPaginationButton('...', false));
+                        }
+
+                        container.appendChild(this.createPaginationButton(totalPages.toString(), true, () => {
+                            this.currentPage = totalPages;
+                            this.updatePagination();
+                        }));
+                    }
+
+                    // Next button
+                    const nextBtn = this.createPaginationButton('Selanjutnya', this.currentPage < totalPages, () => {
+                        if (this.currentPage < totalPages) {
+                            this.currentPage++;
+                            this.updatePagination();
+                        }
+                    });
+                    container.appendChild(nextBtn);
+                }
+
+                createPaginationButton(text, enabled, clickHandler = null, isActive = false) {
+                    const button = document.createElement('button');
+                    button.textContent = text;
+                    button.className = `px-3 py-1 text-xs border rounded transition-colors duration-200 ${
+                isActive 
+                    ? 'bg-gray-900 text-white border-gray-900' 
+                    : enabled 
+                        ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' 
+                        : 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+            }`;
+
+                    if (enabled && clickHandler) {
+                        button.addEventListener('click', clickHandler);
+                    } else {
+                        button.disabled = !enabled;
+                    }
+
+                    return button;
+                }
+
+                onFilterChange() {
+                    this.currentPage = 1;
+                    this.updatePagination();
+                }
+            }
+
+            // Initialize pagination
+            let pagination;
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(() => {
+                    pagination = new ClientPagination();
+                    window.pagination = pagination;
+                }, 200);
             });
 
             // Make functions global
@@ -1007,6 +1314,7 @@
             window.selectProgramStudi = selectProgramStudi;
             window.clearProgramStudiSelection = clearProgramStudiSelection;
             window.clearAllFilters = clearAllFilters;
+            window.closeErrorModal = closeErrorModal;
         </script>
     @endpush
 @endsection

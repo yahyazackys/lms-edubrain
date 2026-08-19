@@ -19,6 +19,7 @@ class MataKuliah extends Model
         'kode_mata_kuliah',
         'nama_mata_kuliah',
         'sks_mata_kuliah',
+        'jenis_mata_kuliah',
     ];
 
     // Relasi Many-to-Many ke Kurikulum

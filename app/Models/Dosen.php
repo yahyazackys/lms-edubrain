@@ -24,6 +24,7 @@ class Dosen extends Model
         'id_program_studi',
         'id_pengguna',
 
+        'foto',
         // Biodata Dosen
         'jenis_kelamin',
         'tempat_lahir',

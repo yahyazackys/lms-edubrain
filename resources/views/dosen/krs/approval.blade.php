@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="ml-3 text-left">
                                     <p class="text-lg font-semibold text-gray-900">{{ $statistik['total_mahasiswa'] }}</p>
-                                    <p class="text-xs ">Total Mahasiswa</p>
+                                    <p class="text-xs text-gray-500">Total Mahasiswa</p>
                                 </div>
                             </div>
 
@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="ml-3 text-left">
                                     <p class="text-lg font-semibold text-gray-900">{{ $statistik['belum_submit'] }}</p>
-                                    <p class="text-xs">Belum Submit</p>
+                                    <p class="text-xs text-gray-500">Belum Submit</p>
                                 </div>
                             </div>
 
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="ml-3 text-left">
                                     <p class="text-lg font-semibold text-gray-900">{{ $statistik['pending'] }}</p>
-                                    <p class="text-xs">Menunggu Review</p>
+                                    <p class="text-xs text-gray-500">Menunggu Review</p>
                                 </div>
                             </div>
 
@@ -86,7 +86,7 @@
                                 </div>
                                 <div class="ml-3 text-left">
                                     <p class="text-lg font-semibold text-gray-900">{{ $statistik['rejected'] }}</p>
-                                    <p class="text-xs">Ditolak</p>
+                                    <p class="text-xs text-gray-500">Ditolak</p>
                                 </div>
                             </div>
 
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="ml-3 text-left">
                                     <p class="text-lg font-semibold text-gray-900">{{ $statistik['approved'] }}</p>
-                                    <p class="text-xs">Sudah Disetujui</p>
+                                    <p class="text-xs text-gray-500">Sudah Disetujui</p>
                                 </div>
                             </div>
                         </div>
@@ -192,9 +192,9 @@
 
                 <!-- Alert Messages -->
                 @if (session('success'))
-                    <div class="bg-gray-50 border border-gray-200 text-gray-800 px-4 py-3 rounded-lg mb-6">
+                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
                         <div class="flex">
-                            <svg class="w-4 h-4 text-gray-600 mt-0.5 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-4 h-4 text-green-600 mt-0.5 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -205,9 +205,9 @@
                 @endif
 
                 @if (session('error'))
-                    <div class="bg-gray-100 border border-gray-300 text-gray-800 px-4 py-3 rounded-lg mb-6">
+                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
                         <div class="flex">
-                            <svg class="w-4 h-4 text-gray-600 mt-0.5 mr-3" fill="none" stroke="currentColor"
+                            <svg class="w-4 h-4 text-red-600 mt-0.5 mr-3" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -231,6 +231,10 @@
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Program Studi
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Mata Kuliah
                                         </th>
                                         <th
                                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -275,25 +279,61 @@
                                                 <div class="text-xs text-gray-900">
                                                     {{ $data->mahasiswa->programStudi->nama_program_studi }}
                                                 </div>
+                                                <div class="text-xs text-gray-500">
+                                                    Angkatan {{ $data->mahasiswa->angkatan }}
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 text-center whitespace-nowrap">
-                                                @if ($data->has_registration && $data->pesertaKelasKuliah->count() > 0)
+                                                @if ($data->has_registration && $data->total_mata_kuliah > 0)
                                                     @php
-                                                        $totalSks = $data->pesertaKelasKuliah->sum(function ($p) {
-                                                            return $p->mataKuliah->sks_mata_kuliah;
-                                                        });
-                                                        $batasSks = $data->batas_sks ?? 24;
+                                                        $jumlahReguler = $data->semua_mata_kuliah
+                                                            ->where('jenis', 'reguler')
+                                                            ->count();
+                                                        $jumlahBimbingan = $data->semua_mata_kuliah
+                                                            ->where('jenis', 'bimbingan')
+                                                            ->count();
                                                     @endphp
 
                                                     <div class="flex flex-col items-center space-y-1">
                                                         <span
                                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                            {{ $totalSks }}/{{ $batasSks }} SKS
+                                                            {{ $data->total_mata_kuliah }} Total
                                                         </span>
 
-                                                        @if ($totalSks > $batasSks)
+                                                        <div class="flex items-center space-x-1">
+                                                            @if ($jumlahReguler > 0)
+                                                                <span
+                                                                    class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                                    {{ $jumlahReguler }}R
+                                                                </span>
+                                                            @endif
+                                                            @if ($jumlahBimbingan > 0)
+                                                                <span
+                                                                    class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                                    {{ $jumlahBimbingan }}B
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <span class="text-xs text-gray-400">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 text-center whitespace-nowrap">
+                                                @if ($data->has_registration && $data->total_sks > 0)
+                                                    @php
+                                                        $batasSks = $data->batas_sks ?? 24;
+                                                    @endphp
+
+                                                    <div class="flex flex-col items-center space-y-1">
+                                                        <span
+                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $data->total_sks > $batasSks ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' }}">
+                                                            {{ $data->total_sks }}/{{ $batasSks }} SKS
+                                                        </span>
+
+                                                        @if ($data->total_sks > $batasSks)
                                                             <span
-                                                                class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800">
+                                                                class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-200 text-red-800">
                                                                 <i
                                                                     class="fa-solid fa-exclamation-triangle mr-1 text-xs"></i>
                                                                 Melebihi Batas
@@ -308,10 +348,12 @@
                                                 @if ($data->status_krs === 'BELUM_SUBMIT' || !$data->has_registration)
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                        <i class="fa-solid fa-edit mr-1"></i>
                                                         Belum Submit KRS
                                                     </span>
                                                 @else
                                                     @php
+                                                        // Hitung status berdasarkan mata kuliah
                                                         $hasRejectedCourses = false;
                                                         $hasApprovedCourses = false;
                                                         $hasSelectedCourses = false;
@@ -319,12 +361,12 @@
                                                         $approvedCount = 0;
 
                                                         if (
-                                                            $data->pesertaKelasKuliah &&
-                                                            $data->pesertaKelasKuliah->count() > 0
+                                                            $data->semua_mata_kuliah &&
+                                                            $data->semua_mata_kuliah->count() > 0
                                                         ) {
-                                                            $totalCourses = $data->pesertaKelasKuliah->count();
+                                                            $totalCourses = $data->semua_mata_kuliah->count();
 
-                                                            foreach ($data->pesertaKelasKuliah as $peserta) {
+                                                            foreach ($data->semua_mata_kuliah as $peserta) {
                                                                 switch ($peserta->status_mata_kuliah) {
                                                                     case 'REJECTED':
                                                                         $hasRejectedCourses = true;
@@ -354,7 +396,7 @@
                                                                 !$hasSelectedCourses &&
                                                                 !$hasRejectedCourses
                                                             ) {
-                                                                $displayStatus = 'approved';
+                                                                $displayStatus = 'ready_to_approve';
                                                             } elseif (
                                                                 $hasSelectedCourses &&
                                                                 !$hasApprovedCourses &&
@@ -372,7 +414,7 @@
                                                     @switch($displayStatus)
                                                         @case('rejected')
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-300 text-gray-800">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                                 <i class="fa-solid fa-times-circle mr-1"></i>
                                                                 Ditolak
                                                             </span>
@@ -380,7 +422,7 @@
 
                                                         @case('needs_revision')
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                                                 <i class="fa-solid fa-exclamation-triangle mr-1"></i>
                                                                 Perlu Revisi
                                                             </span>
@@ -388,18 +430,23 @@
 
                                                         @case('approved')
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-800 text-white">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                                 <i class="fa-solid fa-check-circle mr-1"></i>
                                                                 Disetujui
-                                                                @if ($totalCourses > 0)
-                                                                    ({{ $approvedCount }}/{{ $totalCourses }})
-                                                                @endif
+                                                            </span>
+                                                        @break
+
+                                                        @case('ready_to_approve')
+                                                            <span
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                <i class="fa-solid fa-thumbs-up mr-1"></i>
+                                                                Siap Disetujui
                                                             </span>
                                                         @break
 
                                                         @case('pending_review')
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                                 <i class="fa-solid fa-clock mr-1"></i>
                                                                 Menunggu Review
                                                             </span>
@@ -407,7 +454,7 @@
 
                                                         @case('under_review')
                                                             <span
-                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                                                                 <i class="fa-solid fa-eye mr-1"></i>
                                                                 Dalam Review ({{ $approvedCount }}/{{ $totalCourses }})
                                                             </span>
@@ -438,7 +485,9 @@
                                                 <div class="flex items-center justify-center space-x-2">
                                                     @if (!$data->has_registration || $data->status_krs === 'BELUM_SUBMIT')
                                                         <!-- Belum Submit KRS -->
-                                                        <span class="text-xs text-gray-400">-</span>
+                                                        <span class="text-xs text-gray-400">
+                                                            <i class="fa-solid fa-minus"></i>
+                                                        </span>
                                                     @else
                                                         <!-- Review Button - Hanya untuk yang sudah submit -->
                                                         <a href="{{ route('krs.approval.review', $data->id_registrasi_mahasiswa) }}"

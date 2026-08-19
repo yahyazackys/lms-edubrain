@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class MahasiswaController extends Controller
 {
@@ -52,7 +55,7 @@ class MahasiswaController extends Controller
             });
         }
 
-        $mahasiswas = $query->orderBy('nim')->paginate(10);
+        $mahasiswas = $query->orderBy('nim')->get();
 
         // Data untuk filter dropdown
         $programStudis = ProgramStudi::with('jenjang')
@@ -335,6 +338,105 @@ class MahasiswaController extends Controller
     }
 
     /**
+     * Upload foto profil mahasiswa (admin)
+     */
+    public function uploadPhoto(Request $request, string $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ], [
+            'photo.required' => 'Foto harus dipilih',
+            'photo.image' => 'File harus berupa gambar',
+            'photo.mimes' => 'Format gambar harus: JPG, JPEG, PNG',
+            'photo.max' => 'Ukuran gambar maksimal 2MB',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $mahasiswa = Mahasiswa::with('pengguna')->findOrFail($id);
+
+        try {
+            $oldFoto = $mahasiswa->foto;
+
+            // Handle file upload
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $filename = 'foto_' . $mahasiswa->nim . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+                // Store file dan dapat full path
+                $file->storeAs('foto-mahasiswa', $filename, 'public');
+
+                // Delete old file if exists
+                if ($oldFoto && Storage::disk('public')->exists('foto-mahasiswa/' . $oldFoto)) {
+                    Storage::disk('public')->delete('foto-mahasiswa/' . $oldFoto);
+                }
+
+                // Simpan hanya filename di database, bukan full path
+                $mahasiswa->update(['foto' => $filename]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Foto profil berhasil diperbarui.',
+                    'filename' => $filename
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada file yang diupload'
+            ], 400);
+        } catch (\Exception $e) {
+            // Delete new uploaded file if database update fails
+            if ($request->hasFile('photo') && isset($filename)) {
+                if (Storage::disk('public')->exists('foto-mahasiswa/' . $filename)) {
+                    Storage::disk('public')->delete('foto-mahasiswa/' . $filename);
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupload foto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Hapus foto profil mahasiswa (admin)
+     */
+    public function deletePhoto(string $id): JsonResponse
+    {
+        $mahasiswa = Mahasiswa::with('pengguna')->findOrFail($id);
+
+        try {
+            $oldFoto = $mahasiswa->foto;
+
+            // Delete file if exists
+            if ($oldFoto && Storage::disk('public')->exists('foto-mahasiswa/' . $oldFoto)) {
+                Storage::disk('public')->delete('foto-mahasiswa/' . $oldFoto);
+            }
+
+            // Update database
+            $mahasiswa->update(['foto' => null]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto profil berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus foto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Hapus mahasiswa dan akun terkait
      */
     public function destroy(string $id): RedirectResponse
@@ -436,32 +538,21 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Export template Excel untuk import
+     * Export template Excel untuk import (hanya data wajib)
      */
     public function exportTemplate()
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header kolom
+        // Header kolom (hanya data wajib)
         $headers = [
-            'NIM', 'Nama', 'Jenis Kelamin (L/P)', 'Tempat Lahir', 'Tanggal Lahir (YYYY-MM-DD)',
-            'Angkatan', 'Status (AKTIF/CUTI/DO/KELUAR/LULUS/NONAKTIF)',
-            'NIK (16 digit)', 'NISN', 'NPWP', 'Agama', 'Email', 'No HP',
-            'Kode Program Studi', 'Nama Kurikulum',
-            'Jalan', 'Dusun', 'RT', 'RW', 'Kelurahan', 'Kode Pos',
-
-            // Data Ayah
-            'NIK Ayah', 'Nama Ayah', 'Tempat Lahir Ayah', 'Tanggal Lahir Ayah (YYYY-MM-DD)',
-            'Pendidikan Ayah', 'Pekerjaan Ayah', 'Penghasilan Ayah',
-
-            // Data Ibu  
-            'NIK Ibu', 'Nama Ibu', 'Tempat Lahir Ibu', 'Tanggal Lahir Ibu (YYYY-MM-DD)',
-            'Pendidikan Ibu', 'Pekerjaan Ibu', 'Penghasilan Ibu',
-
-            // Data Wali
-            'Nama Wali', 'Tempat Lahir Wali', 'Tanggal Lahir Wali (YYYY-MM-DD)',
-            'Pendidikan Wali', 'Pekerjaan Wali', 'Penghasilan Wali'
+            'NIM',
+            'Nama Lengkap',
+            'Kode Program Studi',
+            'Nama Kurikulum',
+            'Angkatan',
+            'Status (AKTIF/CUTI/DO/KELUAR/LULUS/NONAKTIF)'
         ];
 
         // Set header
@@ -469,29 +560,106 @@ class MahasiswaController extends Controller
         foreach ($headers as $header) {
             $sheet->setCellValue($column . '1', $header);
             $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE0E0E0');
             $sheet->getColumnDimension($column)->setAutoSize(true);
             $column++;
         }
 
-        // Data contoh
+        // ✅ KUNCI: Format seluruh kolom A (NIM) sebagai TEXT sebelum isi data
+        $sheet->getStyle('A:A')
+            ->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Data contoh dengan berbagai format NIM
         $exampleData = [
-            '20230001', 'John Doe', 'L', 'Jakarta', '2000-01-01',
-            '2023', 'AKTIF', '1234567890123456', '1234567890', '123456789012345',
-            'Islam', 'john@example.com', '081234567890',
-            'TI', 'Kurikulum 2023',
-            'Jl. Sudirman No. 1', 'Kebon Jeruk', '01', '02', 'Kebon Jeruk', '12345',
-            '1234567890123456', 'Budi Santoso', 'Bandung', '1970-01-01',
-            'SMA', 'Wiraswasta', '5-10 Juta',
-            '1234567890123456', 'Siti Aminah', 'Surabaya', '1975-01-01',
-            'SMA', 'Ibu Rumah Tangga', '< 2 Juta',
-            '', '', '', '', '', ''
+            ['003001', 'John Doe', 'TI', 'Kurikulum 2023', '2023', 'AKTIF'],
+            ['20230001', 'Jane Smith', 'SI', 'Kurikulum 2023', '2023', 'AKTIF'],
+            ['00456', 'Bob Wilson', 'IF', 'Kurikulum 2024', '2024', 'CUTI'],
         ];
 
-        $column = 'A';
+        $row = 2;
         foreach ($exampleData as $data) {
-            $sheet->setCellValue($column . '2', $data);
-            $column++;
+            // Set NIM sebagai string explicit
+            $sheet->setCellValueExplicit('A' . $row, $data[0], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+            // Kolom lainnya normal
+            $column = 'B';
+            for ($i = 1; $i < count($data); $i++) {
+                $sheet->setCellValue($column . $row, $data[$i]);
+                $column++;
+            }
+            $row++;
         }
+
+        // Add notes
+        $noteStartRow = $row + 1;
+        $sheet->setCellValue('A' . $noteStartRow, 'CATATAN PENTING:');
+        $sheet->getStyle('A' . $noteStartRow)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $noteStartRow)->getFont()->setSize(12);
+        $sheet->getStyle('A' . $noteStartRow)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF00');
+
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+
+        $sheet->setCellValue('A' . $noteStartRow, '1. NIM: Nomor Induk Mahasiswa - format bebas (wajib diisi, unik)');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '   ✓ Kolom NIM sudah diformat sebagai TEXT, langsung ketik saja: 003001, 00456, dll');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '   ✓ JANGAN ubah format kolom NIM - biarkan sebagai TEXT');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '   ✓ Jika tetap berubah jadi angka, ketik dengan apostrof di depan: \'003001');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '2. Nama Lengkap: Nama lengkap mahasiswa (wajib diisi)');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '3. Kode Program Studi: Kode prodi sesuai data di sistem, contoh: TI, SI, IF (wajib diisi)');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '4. Nama Kurikulum: Nama kurikulum sesuai program studi (wajib diisi)');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '   Contoh: Kurikulum 2023, Kurikulum 2024');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '5. Angkatan: Tahun angkatan dalam format 4 digit, contoh: 2023, 2024');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '6. Status: Pilihan - AKTIF, CUTI, DO, KELUAR, LULUS, NONAKTIF (huruf kapital)');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '7. Username dan password akan dibuat otomatis sesuai dengan NIM');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '8. Pastikan NIM tidak duplikat dengan data yang sudah ada');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '9. Hapus 3 baris contoh di atas sebelum mengisi data sebenarnya');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, '');
+        $noteStartRow++;
+        $sheet->setCellValue('A' . $noteStartRow, 'JANGAN LUPA HAPUS INSTRUKSI KETIKA IMPORT DATA');
+        $sheet->getStyle('A' . $noteStartRow)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $noteStartRow)->getFont()->setSize(12);
+        $sheet->getStyle('A' . $noteStartRow)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF00');
+
+        // Style untuk notes
+        $sheet->getStyle('A' . ($row + 1) . ':A' . $noteStartRow)->getAlignment()->setWrapText(true);
+        $sheet->getColumnDimension('A')->setWidth(100);
 
         $filename = 'template_import_mahasiswa_' . date('Y-m-d') . '.xlsx';
 
@@ -505,7 +673,63 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Import mahasiswa dari Excel
+     * Export data mahasiswa ke Excel (hanya data wajib)
+     */
+    public function export()
+    {
+        $mahasiswas = Mahasiswa::with(['pengguna', 'programStudi', 'kurikulum'])
+            ->orderBy('nim')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $headers = ['NIM', 'Nama Lengkap', 'Kode Program Studi', 'Nama Kurikulum', 'Angkatan', 'Status'];
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE0E0E0');
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+            $column++;
+        }
+
+        // ✅ Format kolom NIM sebagai TEXT
+        $sheet->getStyle('A:A')
+            ->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Data
+        $row = 2;
+        foreach ($mahasiswas as $mahasiswa) {
+            // Set NIM sebagai string explicit
+            $sheet->setCellValueExplicit('A' . $row, $mahasiswa->nim, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+            // Kolom lainnya
+            $sheet->setCellValue('B' . $row, $mahasiswa->pengguna->nama);
+            $sheet->setCellValue('C' . $row, $mahasiswa->programStudi->kode_program_studi ?? '');
+            $sheet->setCellValue('D' . $row, $mahasiswa->kurikulum->nama_kurikulum ?? '');
+            $sheet->setCellValue('E' . $row, $mahasiswa->angkatan);
+            $sheet->setCellValue('F' . $row, $mahasiswa->status_mahasiswa);
+            $row++;
+        }
+
+        $filename = 'data_mahasiswa_' . date('Y-m-d_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Import mahasiswa dari Excel (hanya data wajib)
      */
     public function import(Request $request): RedirectResponse
     {
@@ -523,12 +747,13 @@ class MahasiswaController extends Controller
             array_shift($rows);
 
             $importedCount = 0;
+            $skippedCount = 0;
             $errors = [];
 
             DB::beginTransaction();
 
             foreach ($rows as $index => $row) {
-                $rowNumber = $index + 2; // +2 karena index mulai dari 0 dan ada header
+                $rowNumber = $index + 2;
 
                 // Skip empty rows
                 if (empty(array_filter($row))) {
@@ -537,46 +762,74 @@ class MahasiswaController extends Controller
 
                 try {
                     // Validasi data wajib
-                    if (empty($row[0])) {
+                    $nim = trim((string)($row[0] ?? ''));  // Cast ke string untuk preserve format apapun
+                    $nama = trim($row[1] ?? '');
+                    $kodeProdi = trim($row[2] ?? '');
+                    $namaKurikulum = trim($row[3] ?? '');
+                    $angkatan = trim($row[4] ?? '');
+                    $status = strtoupper(trim($row[5] ?? ''));
+
+                    // Validasi NIM - hanya cek kosong dan duplikasi, TIDAK ada validasi format
+                    if (empty($nim)) {
                         $errors[] = "Baris {$rowNumber}: NIM tidak boleh kosong";
+                        $skippedCount++;
                         continue;
                     }
 
-                    if (empty($row[1])) {
+                    // Validasi Nama
+                    if (empty($nama)) {
                         $errors[] = "Baris {$rowNumber}: Nama tidak boleh kosong";
+                        $skippedCount++;
+                        continue;
+                    }
+
+                    // Validasi Status
+                    if (!in_array($status, ['AKTIF', 'CUTI', 'DO', 'KELUAR', 'LULUS', 'NONAKTIF'])) {
+                        $errors[] = "Baris {$rowNumber}: Status tidak valid (harus: AKTIF, CUTI, DO, KELUAR, LULUS, atau NONAKTIF)";
+                        $skippedCount++;
                         continue;
                     }
 
                     // Cek program studi berdasarkan kode
-                    $programStudi = ProgramStudi::where('kode_program_studi', $row[13])->first();
+                    $programStudi = ProgramStudi::where('kode_program_studi', $kodeProdi)
+                        ->where('status', 'A')
+                        ->first();
+
                     if (!$programStudi) {
-                        $errors[] = "Baris {$rowNumber}: Kode program studi '{$row[13]}' tidak ditemukan";
+                        $errors[] = "Baris {$rowNumber}: Kode program studi '{$kodeProdi}' tidak ditemukan";
+                        $skippedCount++;
                         continue;
                     }
 
                     // Cek kurikulum berdasarkan nama dan program studi
-                    $kurikulum = Kurikulum::where('nama_kurikulum', $row[14])
+                    $kurikulum = Kurikulum::where('nama_kurikulum', $namaKurikulum)
                         ->where('id_program_studi', $programStudi->id_program_studi)
                         ->first();
+
                     if (!$kurikulum) {
-                        $errors[] = "Baris {$rowNumber}: Kurikulum '{$row[14]}' tidak ditemukan untuk program studi {$row[13]}";
+                        $errors[] = "Baris {$rowNumber}: Kurikulum '{$namaKurikulum}' tidak ditemukan untuk program studi {$kodeProdi}";
+                        $skippedCount++;
                         continue;
                     }
 
                     // Cek duplikasi NIM
-                    if (Mahasiswa::where('nim', $row[0])->exists()) {
-                        $errors[] = "Baris {$rowNumber}: NIM '{$row[0]}' sudah terdaftar";
+                    if (Mahasiswa::where('nim', $nim)->exists()) {
+                        $errors[] = "Baris {$rowNumber}: NIM '{$nim}' sudah terdaftar";
+                        $skippedCount++;
                         continue;
+                    }
+
+                    // Validasi angkatan
+                    if (empty($angkatan) || !is_numeric($angkatan)) {
+                        $angkatan = date('Y');
                     }
 
                     // Buat akun pengguna
                     $pengguna = Pengguna::create([
                         'id_pengguna' => (string) Str::uuid(),
-                        'nama' => $row[1],
-                        'username' => $row[0],
-                        'password' => Hash::make($row[0]),
-                        'email' => !empty($row[11]) ? $row[11] : null,
-                        'no_hp' => !empty($row[12]) ? $row[12] : null,
+                        'nama' => $nama,
+                        'username' => $nim,
+                        'password' => Hash::make($nim),
                         'role' => 'mahasiswa',
                         'is_active' => true,
                     ]);
@@ -584,74 +837,45 @@ class MahasiswaController extends Controller
                     // Buat data mahasiswa
                     Mahasiswa::create([
                         'id_mahasiswa' => (string) Str::uuid(),
-                        'nim' => $row[0],
-                        'jenis_kelamin' => !empty($row[2]) && in_array($row[2], ['L', 'P']) ? $row[2] : null,
-                        'tempat_lahir' => !empty($row[3]) ? $row[3] : null,
-                        'tanggal_lahir' => !empty($row[4]) ? date('Y-m-d', strtotime($row[4])) : null,
-                        'angkatan' => !empty($row[5]) ? $row[5] : date('Y'),
-                        'status_mahasiswa' => !empty($row[6]) && in_array($row[6], ['AKTIF', 'CUTI', 'DO', 'KELUAR', 'LULUS', 'NONAKTIF']) ? $row[6] : 'AKTIF',
-                        'nik' => !empty($row[7]) && strlen($row[7]) == 16 ? $row[7] : null,
-                        'nisn' => !empty($row[8]) ? $row[8] : null,
-                        'npwp' => !empty($row[9]) ? $row[9] : null,
-                        'agama' => !empty($row[10]) ? $row[10] : null,
+                        'nim' => $nim,
                         'id_program_studi' => $programStudi->id_program_studi,
                         'id_kurikulum' => $kurikulum->id_kurikulum,
+                        'angkatan' => $angkatan,
+                        'status_mahasiswa' => $status,
                         'id_pengguna' => $pengguna->id_pengguna,
-
-                        // Alamat
-                        'jalan' => !empty($row[15]) ? $row[15] : null,
-                        'dusun' => !empty($row[16]) ? $row[16] : null,
-                        'rt' => !empty($row[17]) ? $row[17] : null,
-                        'rw' => !empty($row[18]) ? $row[18] : null,
-                        'kelurahan' => !empty($row[19]) ? $row[19] : null,
-                        'kode_pos' => !empty($row[20]) ? $row[20] : null,
-
-                        // Data Ayah
-                        'nik_ayah' => !empty($row[21]) && strlen($row[21]) == 16 ? $row[21] : null,
-                        'nama_ayah' => !empty($row[22]) ? $row[22] : null,
-                        'tempat_lahir_ayah' => !empty($row[23]) ? $row[23] : null,
-                        'tanggal_lahir_ayah' => !empty($row[24]) ? date('Y-m-d', strtotime($row[24])) : null,
-                        'nama_pendidikan_ayah' => !empty($row[25]) ? $row[25] : null,
-                        'nama_pekerjaan_ayah' => !empty($row[26]) ? $row[26] : null,
-                        'nama_penghasilan_ayah' => !empty($row[27]) ? $row[27] : null,
-
-                        // Data Ibu
-                        'nik_ibu' => !empty($row[28]) && strlen($row[28]) == 16 ? $row[28] : null,
-                        'nama_ibu' => !empty($row[29]) ? $row[29] : null,
-                        'tempat_lahir_ibu' => !empty($row[30]) ? $row[30] : null,
-                        'tanggal_lahir_ibu' => !empty($row[31]) ? date('Y-m-d', strtotime($row[31])) : null,
-                        'nama_pendidikan_ibu' => !empty($row[32]) ? $row[32] : null,
-                        'nama_pekerjaan_ibu' => !empty($row[33]) ? $row[33] : null,
-                        'nama_penghasilan_ibu' => !empty($row[34]) ? $row[34] : null,
-
-                        // Data Wali
-                        'nama_wali' => !empty($row[35]) ? $row[35] : null,
-                        'tempat_lahir_wali' => !empty($row[36]) ? $row[36] : null,
-                        'tanggal_lahir_wali' => !empty($row[37]) ? date('Y-m-d', strtotime($row[37])) : null,
-                        'nama_pendidikan_wali' => !empty($row[38]) ? $row[38] : null,
-                        'nama_pekerjaan_wali' => !empty($row[39]) ? $row[39] : null,
-                        'nama_penghasilan_wali' => !empty($row[40]) ? $row[40] : null,
                     ]);
 
                     $importedCount++;
                 } catch (\Exception $e) {
                     $errors[] = "Baris {$rowNumber}: " . $e->getMessage();
+                    $skippedCount++;
                 }
             }
 
-            if (empty($errors)) {
-                DB::commit();
+            DB::commit();
+
+            // Handle hasil import
+            if ($importedCount > 0 && empty($errors)) {
                 return redirect()->route('mahasiswa.index')
                     ->with('success', "Berhasil mengimpor {$importedCount} data mahasiswa.");
-            } else {
-                DB::rollback();
-                $errorMessage = "Import gagal. Kesalahan:\n" . implode("\n", array_slice($errors, 0, 10));
-                if (count($errors) > 10) {
-                    $errorMessage .= "\ndan " . (count($errors) - 10) . " kesalahan lainnya...";
-                }
-                return redirect()->route('mahasiswa.index')
-                    ->with('error', $errorMessage);
             }
+
+            if ($importedCount > 0 && !empty($errors)) {
+                $request->session()->flash('import_errors', $errors);
+
+                return redirect()->route('mahasiswa.index')
+                    ->with('warning', "Berhasil mengimpor {$importedCount} data mahasiswa. {$skippedCount} data dilewati. Klik untuk melihat detail error.");
+            }
+
+            if ($importedCount === 0 && !empty($errors)) {
+                $request->session()->flash('import_errors', $errors);
+
+                return redirect()->route('mahasiswa.index')
+                    ->with('error', 'Import gagal. Tidak ada data yang berhasil diimpor. Klik untuk melihat detail error.');
+            }
+
+            return redirect()->route('mahasiswa.index')
+                ->with('info', 'Tidak ada data yang diimpor. File mungkin kosong.');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('mahasiswa.index')

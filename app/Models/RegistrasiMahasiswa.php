@@ -62,6 +62,11 @@ class RegistrasiMahasiswa extends Model
         return $this->hasMany(PesertaKelasKuliah::class, 'id_registrasi_mahasiswa', 'id_registrasi_mahasiswa');
     }
 
+    public function pesertaBimbingan(): HasMany
+    {
+        return $this->hasMany(PesertaBimbingan::class, 'id_registrasi_mahasiswa', 'id_registrasi_mahasiswa');
+    }
+
     /**
      * Scope untuk filter berdasarkan semester
      */

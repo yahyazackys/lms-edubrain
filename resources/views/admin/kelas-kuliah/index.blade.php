@@ -158,9 +158,20 @@
                                                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
                                                         Semester {{ $kelas->kurikulumMataKuliah->semester ?? 'N/A' }}
                                                     </span>
+                                                    <!-- ✅ Fix: Tampilkan jenis mata kuliah dari mata_kuliah -->
                                                     <span
-                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $kelas->kurikulumMataKuliah->jenis_mata_kuliah == 'WAJIB' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                        {{ $kelas->kurikulumMataKuliah->jenis_mata_kuliah ?? 'N/A' }}
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                {{ ($kelas->kurikulumMataKuliah->mataKuliah->jenis_mata_kuliah ?? '') == 'TEORI'
+                    ? 'bg-blue-100 text-blue-800'
+                    : (($kelas->kurikulumMataKuliah->mataKuliah->jenis_mata_kuliah ?? '') == 'PRAKTIKUM'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-purple-100 text-purple-800') }}">
+                                                        {{ $kelas->kurikulumMataKuliah->mataKuliah->jenis_mata_kuliah ?? 'N/A' }}
+                                                    </span>
+                                                    <!-- ✅ Fix: Tampilkan kategori mata kuliah dari kurikulum_mata_kuliah -->
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        {{ $kelas->kurikulumMataKuliah->kategori_mata_kuliah ?? 'N/A' }}
                                                     </span>
                                                 </div>
                                             </div>

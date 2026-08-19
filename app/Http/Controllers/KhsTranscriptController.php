@@ -137,10 +137,12 @@ class KhsTranscriptController extends Controller
             $semesterId = $request->get('semester_id');
             $khsData = $this->khsTranscriptService->generateKhs($mahasiswaId, $semesterId);
 
-            $pdf = PDF::loadView('pdf.khs', compact('khsData'));
+            $pdf = PDF::loadView('akademik.khs.pdf', compact('khsData'))
+                ->setPaper('a4', 'portrait'); // TAMBAHKAN INI
+
             $filename = 'KHS_' . $khsData['mahasiswa']['nim'] . '_' . $khsData['semester']['kode'] . '.pdf';
 
-            return $pdf->download($filename);
+            return $pdf->stream($filename);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -173,10 +175,12 @@ class KhsTranscriptController extends Controller
 
             $transcriptData = $this->khsTranscriptService->generateTranscript($mahasiswaId);
 
-            $pdf = PDF::loadView('pdf.transcript', compact('transcriptData'));
-            $filename = 'Transcript_' . $transcriptData['mahasiswa']['nim'] . '.pdf';
+            $pdf = PDF::loadView('akademik.transcript.pdf', compact('transcriptData'))
+                ->setPaper('a4', 'portrait');
 
-            return $pdf->download($filename);
+            $filename = 'Transkrip_' . $transcriptData['mahasiswa']['nim'] . '.pdf';
+
+            return $pdf->stream($filename);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

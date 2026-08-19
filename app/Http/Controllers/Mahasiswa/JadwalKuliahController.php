@@ -39,7 +39,8 @@ class JadwalKuliahController extends Controller
                 ])
                     ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswa, $selectedSemesterId) {
                         $q->where('id_mahasiswa', $mahasiswa->id_mahasiswa)
-                            ->where('id_semester', $selectedSemesterId);
+                            ->where('id_semester', $selectedSemesterId)
+                            ->where('status_krs', 'APPROVED');
                     })
                     ->where('status_mata_kuliah', 'APPROVED') // Hanya yang sudah disetujui
                     ->get();

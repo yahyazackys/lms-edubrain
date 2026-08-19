@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\RegistrasiMahasiswa;
 use App\Models\PesertaKelasKuliah;
+use App\Models\PesertaBimbingan;
 use App\Models\PembimbingAkademik;
 use App\Models\Mahasiswa;
 use App\Models\Semester;
 use App\Models\Dosen;
 use App\Models\KelasKuliah;
 use App\Models\NilaiPerkuliahan;
+use App\Models\KurikulumMataKuliah;
 
 class KrsApprovalController extends Controller
 {
@@ -45,7 +47,10 @@ class KrsApprovalController extends Controller
                         $q->where('id_semester', $selectedSemesterId)
                             ->with([
                                 'pesertaKelasKuliah.mataKuliah',
-                                'pesertaKelasKuliah.kelasKuliah.dosen.pengguna'
+                                'pesertaKelasKuliah.kelasKuliah.dosen.pengguna',
+                                'pesertaBimbingan.mataKuliah',
+                                'pesertaBimbingan.dosenPembimbing.pengguna',
+                                'pesertaBimbingan.dosenPembimbing2.pengguna'
                             ]);
                     },
                     'semester'
@@ -110,7 +115,12 @@ class KrsApprovalController extends Controller
                         $item->tanggal_submit = $registrasi->tanggal_submit;
                         $item->tanggal_approval = $registrasi->tanggal_approval;
                         $item->alasan_reject = $registrasi->alasan_reject;
-                        $item->pesertaKelasKuliah = $registrasi->pesertaKelasKuliah;
+
+                        // Gabungkan mata kuliah reguler dan bimbingan
+                        $mataKuliahTerpilih = $this->getMataKuliahTerpilih($registrasi->id_registrasi_mahasiswa);
+                        $item->semua_mata_kuliah = $mataKuliahTerpilih;
+                        $item->total_sks = $this->hitungTotalSks($mataKuliahTerpilih);
+                        $item->total_mata_kuliah = $mataKuliahTerpilih->count();
                     } else {
                         // Mahasiswa belum ada registrasi
                         $item->id_registrasi_mahasiswa = null;
@@ -118,7 +128,9 @@ class KrsApprovalController extends Controller
                         $item->tanggal_submit = null;
                         $item->tanggal_approval = null;
                         $item->alasan_reject = null;
-                        $item->pesertaKelasKuliah = collect();
+                        $item->semua_mata_kuliah = collect();
+                        $item->total_sks = 0;
+                        $item->total_mata_kuliah = 0;
                     }
 
                     return $item;
@@ -183,6 +195,13 @@ class KrsApprovalController extends Controller
                     'kelasKuliah.dosen.pengguna',
                     'kelasKuliah.kurikulumMataKuliah'
                 ]);
+            },
+            'pesertaBimbingan' => function ($query) {
+                $query->with([
+                    'mataKuliah',
+                    'dosenPembimbing.pengguna',
+                    'dosenPembimbing2.pengguna'
+                ]);
             }
         ])
             ->whereHas('pembimbingAkademik', function ($q) use ($dosen) {
@@ -190,22 +209,25 @@ class KrsApprovalController extends Controller
             })
             ->findOrFail($registrasiId);
 
-        // Hitung total SKS
-        $totalSks = $registrasiMahasiswa->pesertaKelasKuliah->sum(function ($peserta) {
-            return $peserta->mataKuliah->sks_mata_kuliah;
-        });
+        // Get mata kuliah terpilih (gabungan reguler + bimbingan)
+        $mataKuliahTerpilih = $this->getMataKuliahTerpilih($registrasiId);
 
-        // Generate jadwal mingguan
-        $jadwalMingguan = $this->generateJadwalMingguan($registrasiMahasiswa->pesertaKelasKuliah);
+        // Hitung total SKS dari semua mata kuliah
+        $totalSks = $this->hitungTotalSks($mataKuliahTerpilih);
+
+        // Generate jadwal mingguan hanya untuk mata kuliah reguler
+        $mataKuliahReguler = $mataKuliahTerpilih->where('jenis', 'reguler');
+        $jadwalMingguan = $this->generateJadwalMingguan($mataKuliahReguler);
 
         // Get riwayat akademik mahasiswa
         $riwayatAkademik = $this->getRiwayatAkademik($registrasiMahasiswa->mahasiswa->id_mahasiswa);
 
         // Get rekomendasi berdasarkan IPK dan semester
-        $rekomendasi = $this->generateRekomendasi($registrasiMahasiswa);
+        $rekomendasi = $this->generateRekomendasi($registrasiMahasiswa, $mataKuliahTerpilih, $totalSks);
 
         return view('dosen.krs.review', compact([
             'registrasiMahasiswa',
+            'mataKuliahTerpilih',
             'totalSks',
             'jadwalMingguan',
             'riwayatAkademik',
@@ -214,12 +236,13 @@ class KrsApprovalController extends Controller
     }
 
     /**
-     * Approve/Reject mata kuliah individual
+     * Approve/Reject mata kuliah individual (reguler atau bimbingan)
      */
     public function updateMataKuliah(Request $request)
     {
         $request->validate([
-            'id_peserta' => 'required|exists:peserta_kelas_kuliah,id_peserta',
+            'id_peserta' => 'required',
+            'jenis' => 'required|in:reguler,bimbingan',
             'action' => 'required|in:approve,reject',
             'catatan' => 'nullable|string|max:500'
         ]);
@@ -230,20 +253,33 @@ class KrsApprovalController extends Controller
             $user = Auth::user();
             $dosen = Dosen::where('id_pengguna', $user->id_pengguna)->first();
 
-            $pesertaKelasKuliah = PesertaKelasKuliah::with(['registrasiMahasiswa.pembimbingAkademik'])
-                ->findOrFail($request->id_peserta);
+            if ($request->jenis === 'reguler') {
+                $peserta = PesertaKelasKuliah::with(['registrasiMahasiswa.pembimbingAkademik'])
+                    ->findOrFail($request->id_peserta);
 
-            // Validasi PA
-            if ($pesertaKelasKuliah->registrasiMahasiswa->pembimbingAkademik->id_dosen !== $dosen->id_dosen) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak berwenang untuk mata kuliah ini!'
-                ], 403);
+                // Validasi PA
+                if ($peserta->registrasiMahasiswa->pembimbingAkademik->id_dosen !== $dosen->id_dosen) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Anda tidak berwenang untuk mata kuliah ini!'
+                    ], 403);
+                }
+            } else {
+                $peserta = PesertaBimbingan::with(['registrasiMahasiswa.pembimbingAkademik'])
+                    ->findOrFail($request->id_peserta);
+
+                // Validasi PA
+                if ($peserta->registrasiMahasiswa->pembimbingAkademik->id_dosen !== $dosen->id_dosen) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Anda tidak berwenang untuk mata kuliah ini!'
+                    ], 403);
+                }
             }
 
             // Update status mata kuliah
             $newStatus = $request->action === 'approve' ? 'APPROVED' : 'REJECTED';
-            $pesertaKelasKuliah->update([
+            $peserta->update([
                 'status_mata_kuliah' => $newStatus
             ]);
 
@@ -253,7 +289,8 @@ class KrsApprovalController extends Controller
                 'success' => true,
                 'message' => 'Status mata kuliah berhasil diupdate!',
                 'data' => [
-                    'new_status' => $newStatus
+                    'new_status' => $newStatus,
+                    'jenis' => $request->jenis
                 ]
             ]);
         } catch (\Exception $e) {
@@ -281,7 +318,11 @@ class KrsApprovalController extends Controller
             $user = Auth::user();
             $dosen = Dosen::where('id_pengguna', $user->id_pengguna)->first();
 
-            $registrasiMahasiswa = RegistrasiMahasiswa::with(['pembimbingAkademik', 'pesertaKelasKuliah'])
+            $registrasiMahasiswa = RegistrasiMahasiswa::with([
+                'pembimbingAkademik',
+                'pesertaKelasKuliah',
+                'pesertaBimbingan'
+            ])
                 ->whereHas('pembimbingAkademik', function ($q) use ($dosen) {
                     $q->where('id_dosen', $dosen->id_dosen);
                 })
@@ -293,18 +334,30 @@ class KrsApprovalController extends Controller
             }
 
             // Cek apakah semua mata kuliah sudah di-review
-            $belumDiReview = $registrasiMahasiswa->pesertaKelasKuliah()
+            $belumDiReviewReguler = $registrasiMahasiswa->pesertaKelasKuliah()
                 ->where('status_mata_kuliah', 'SELECTED')
                 ->count();
 
-            if ($belumDiReview > 0) {
+            $belumDiReviewBimbingan = $registrasiMahasiswa->pesertaBimbingan()
+                ->where('status_mata_kuliah', 'SELECTED')
+                ->count();
+
+            $totalBelumReview = $belumDiReviewReguler + $belumDiReviewBimbingan;
+
+            if ($totalBelumReview > 0) {
                 return redirect()->back()->with('error', 'Masih ada mata kuliah yang belum di-review!');
             }
 
             // Cek apakah ada mata kuliah yang di-approve
-            $totalApproved = $registrasiMahasiswa->pesertaKelasKuliah()
+            $totalApprovedReguler = $registrasiMahasiswa->pesertaKelasKuliah()
                 ->where('status_mata_kuliah', 'APPROVED')
                 ->count();
+
+            $totalApprovedBimbingan = $registrasiMahasiswa->pesertaBimbingan()
+                ->where('status_mata_kuliah', 'APPROVED')
+                ->count();
+
+            $totalApproved = $totalApprovedReguler + $totalApprovedBimbingan;
 
             if ($totalApproved == 0) {
                 return redirect()->back()->with('error', 'Tidak ada mata kuliah yang di-approve!');
@@ -312,6 +365,10 @@ class KrsApprovalController extends Controller
 
             // Hapus mata kuliah yang di-reject
             $registrasiMahasiswa->pesertaKelasKuliah()
+                ->where('status_mata_kuliah', 'REJECTED')
+                ->delete();
+
+            $registrasiMahasiswa->pesertaBimbingan()
                 ->where('status_mata_kuliah', 'REJECTED')
                 ->delete();
 
@@ -377,45 +434,82 @@ class KrsApprovalController extends Controller
     }
 
     /**
-     * Get daftar kelas alternatif untuk penggantian
+     * Helper Methods
      */
-    public function getKelasAlternatif(Request $request)
-    {
-        $request->validate([
-            'id_mata_kuliah' => 'required|exists:mata_kuliah,id_mata_kuliah',
-            'id_semester' => 'required|exists:semester,id_semester'
-        ]);
 
-        $kelasAlternatif = KelasKuliah::with([
-            'dosen.pengguna',
-            'kurikulumMataKuliah.mataKuliah'
+    /**
+     * Get mata kuliah terpilih gabungan (reguler + bimbingan)
+     */
+    private function getMataKuliahTerpilih($registrasiId)
+    {
+        // Mata kuliah reguler
+        $mataKuliahReguler = PesertaKelasKuliah::with([
+            'mataKuliah',
+            'kelasKuliah.dosen.pengguna',
+            'kelasKuliah.kurikulumMataKuliah'
         ])
-            ->whereHas('kurikulumMataKuliah', function ($query) use ($request) {
-                $query->where('id_mata_kuliah', $request->id_mata_kuliah);
-            })
-            ->where('id_semester', $request->id_semester)
+            ->where('id_registrasi_mahasiswa', $registrasiId)
             ->get()
-            ->map(function ($kelas) {
-                return [
-                    'id_kelas_kuliah' => $kelas->id_kelas_kuliah,
-                    'nama_kelas_kuliah' => $kelas->nama_kelas_kuliah,
-                    'nama_ruangan' => $kelas->nama_ruangan,
-                    'hari' => $kelas->hari,
-                    'jam_mulai' => $kelas->jam_mulai,
-                    'jam_akhir' => $kelas->jam_akhir,
-                    'kapasitas' => $kelas->kapasitas,
-                    'jumlah_peserta' => $kelas->jumlah_peserta,
-                    'dosen_nama' => $kelas->dosen->pengguna->nama ?? 'N/A',
-                    'is_penuh' => $kelas->isPenuh()
+            ->map(function ($peserta) {
+                return (object)[
+                    'id_peserta' => $peserta->id_peserta,
+                    'jenis' => 'reguler',
+                    'mataKuliah' => $peserta->mataKuliah,
+                    'kelasKuliah' => $peserta->kelasKuliah,
+                    'status_mata_kuliah' => $peserta->status_mata_kuliah,
+                    'kategori_mata_kuliah' => $peserta->kelasKuliah->kurikulumMataKuliah->kategori_mata_kuliah ?? 'MKWPS',
+                    'semester' => $peserta->kelasKuliah->kurikulumMataKuliah->semester,
+                    'dosen' => $peserta->kelasKuliah->dosen->pengguna->nama ?? 'Belum diatur',
+                    'kelas' => $peserta->kelasKuliah->nama_kelas_kuliah,
+                    'ruangan' => $peserta->kelasKuliah->nama_ruangan,
+                    'hari' => $peserta->kelasKuliah->hari,
+                    'jam_mulai' => $peserta->kelasKuliah->jam_mulai,
+                    'jam_akhir' => $peserta->kelasKuliah->jam_akhir,
                 ];
             });
 
-        return response()->json($kelasAlternatif);
+        // Mata kuliah bimbingan
+        $mataKuliahBimbingan = PesertaBimbingan::with([
+            'mataKuliah',
+            'dosenPembimbing.pengguna',
+            'dosenPembimbing2.pengguna'
+        ])
+            ->where('id_registrasi_mahasiswa', $registrasiId)
+            ->get()
+            ->map(function ($peserta) {
+                // Get kurikulum mata kuliah info
+                $kurikulumMk = KurikulumMataKuliah::where('id_mata_kuliah', $peserta->id_mata_kuliah)->first();
+
+                return (object)[
+                    'id_peserta' => $peserta->id_peserta_bimbingan,
+                    'jenis' => 'bimbingan',
+                    'mataKuliah' => $peserta->mataKuliah,
+                    'kelasKuliah' => null,
+                    'status_mata_kuliah' => $peserta->status_mata_kuliah,
+                    'kategori_mata_kuliah' => $kurikulumMk->kategori_mata_kuliah ?? 'MKWPS',
+                    'semester' => $kurikulumMk->semester ?? 0,
+                    'dosen' => $peserta->dosenPembimbing->pengguna->nama ?? 'Belum diatur',
+                    'dosen_pembimbing_2' => $peserta->dosenPembimbing2->pengguna->nama ?? null,
+                    'kelas' => null,
+                    'ruangan' => null,
+                    'hari' => null,
+                    'jam_mulai' => null,
+                    'jam_akhir' => null,
+                ];
+            });
+
+        return $mataKuliahReguler->concat($mataKuliahBimbingan);
     }
 
     /**
-     * Helper Methods
+     * Hitung total SKS dari koleksi mata kuliah
      */
+    private function hitungTotalSks($mataKuliahCollection)
+    {
+        return $mataKuliahCollection->sum(function ($peserta) {
+            return $peserta->mataKuliah->sks_mata_kuliah;
+        });
+    }
 
     /**
      * Hitung statistik KRS untuk PA
@@ -476,7 +570,7 @@ class KrsApprovalController extends Controller
     }
 
     /**
-     * Generate jadwal mingguan
+     * Generate jadwal mingguan (hanya untuk mata kuliah reguler)
      */
     private function generateJadwalMingguan($pesertaKelasKuliahs)
     {
@@ -489,6 +583,7 @@ class KrsApprovalController extends Controller
 
         foreach ($pesertaKelasKuliahs as $peserta) {
             if ($peserta->status_mata_kuliah === 'REJECTED') continue;
+            if (!$peserta->kelasKuliah) continue; // Skip bimbingan
 
             $kelas = $peserta->kelasKuliah;
 
@@ -526,7 +621,10 @@ class KrsApprovalController extends Controller
         return DB::table('registrasi_mahasiswa as rm')
             ->join('semester as s', 'rm.id_semester', '=', 's.id_semester')
             ->leftJoin('peserta_kelas_kuliah as pkk', 'rm.id_registrasi_mahasiswa', '=', 'pkk.id_registrasi_mahasiswa')
-            ->leftJoin('nilai_perkuliahan as np', 'pkk.id_peserta', '=', 'np.id_peserta')
+            ->leftJoin('nilai_perkuliahan as np', function ($join) {
+                $join->on('pkk.id_peserta', '=', 'np.id_peserta')
+                    ->where('np.jenis_peserta', '=', 'KELAS');
+            })
             ->leftJoin('mata_kuliah as mk', 'pkk.id_mata_kuliah', '=', 'mk.id_mata_kuliah')
             ->where('rm.id_mahasiswa', $mahasiswaId)
             ->where('rm.status_krs', 'APPROVED')
@@ -545,17 +643,15 @@ class KrsApprovalController extends Controller
     /**
      * Generate rekomendasi berdasarkan IPK dan semester
      */
-    private function generateRekomendasi($registrasiMahasiswa)
+    private function generateRekomendasi($registrasiMahasiswa, $mataKuliahTerpilih, $totalSks)
     {
         $rekomendasi = [];
-        $totalSks = $registrasiMahasiswa->pesertaKelasKuliah->sum(function ($peserta) {
-            return $peserta->mataKuliah->sks_mata_kuliah;
-        });
+        $batasSks = $this->getBatasSks($registrasiMahasiswa->mahasiswa);
 
         // Rekomendasi berdasarkan beban SKS
-        if ($totalSks > 24) {
+        if ($totalSks > $batasSks) {
             $rekomendasi[] = [
-                'type' => 'warning',
+                'type' => 'error',
                 'message' => 'Total SKS terlalu tinggi (' . $totalSks . ' SKS). Pertimbangkan untuk mengurangi beban mata kuliah.'
             ];
         } elseif ($totalSks < 12) {
@@ -565,8 +661,9 @@ class KrsApprovalController extends Controller
             ];
         }
 
-        // Cek bentrok jadwal
-        $bentrokJadwal = $this->cekBentrokJadwal($registrasiMahasiswa->pesertaKelasKuliah);
+        // Cek bentrok jadwal hanya untuk mata kuliah reguler
+        $mataKuliahReguler = $mataKuliahTerpilih->where('jenis', 'reguler');
+        $bentrokJadwal = $this->cekBentrokJadwal($mataKuliahReguler);
         if (!empty($bentrokJadwal)) {
             foreach ($bentrokJadwal as $bentrok) {
                 $rekomendasi[] = [
@@ -576,11 +673,22 @@ class KrsApprovalController extends Controller
             }
         }
 
+        // Cek rasio mata kuliah reguler vs bimbingan
+        $jumlahReguler = $mataKuliahTerpilih->where('jenis', 'reguler')->count();
+        $jumlahBimbingan = $mataKuliahTerpilih->where('jenis', 'bimbingan')->count();
+
+        if ($jumlahBimbingan > $jumlahReguler && $jumlahReguler > 0) {
+            $rekomendasi[] = [
+                'type' => 'warning',
+                'message' => 'Mata kuliah bimbingan (' . $jumlahBimbingan . ') lebih banyak dari mata kuliah reguler (' . $jumlahReguler . '). Pastikan mahasiswa siap dengan beban bimbingan.'
+            ];
+        }
+
         return $rekomendasi;
     }
 
     /**
-     * Cek bentrok jadwal
+     * Cek bentrok jadwal (hanya untuk mata kuliah reguler)
      */
     private function cekBentrokJadwal($pesertaKelasKuliahs)
     {
@@ -589,6 +697,7 @@ class KrsApprovalController extends Controller
 
         foreach ($pesertaKelasKuliahs as $peserta) {
             if ($peserta->status_mata_kuliah === 'REJECTED') continue;
+            if (!$peserta->kelasKuliah) continue; // Skip yang tidak ada kelas
 
             $kelas = $peserta->kelasKuliah;
 
@@ -674,25 +783,44 @@ class KrsApprovalController extends Controller
      */
     private function hitungIPK($mahasiswaId)
     {
-        $nilaiPerkuliahan = NilaiPerkuliahan::whereHas('pesertaKelasKuliah', function ($query) use ($mahasiswaId) {
+        // Update query untuk support dual system nilai
+        $nilaiReguler = NilaiPerkuliahan::whereHas('pesertaKelasKuliah', function ($query) use ($mahasiswaId) {
             $query->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
                 $q->where('id_mahasiswa', $mahasiswaId);
             });
         })
+            ->where('jenis_peserta', 'KELAS')
             ->with('pesertaKelasKuliah.mataKuliah')
             ->whereNotNull('nilai_huruf')
             ->get();
 
-        if ($nilaiPerkuliahan->count() == 0) {
+        $nilaiBimbingan = NilaiPerkuliahan::whereHas('pesertaBimbingan', function ($query) use ($mahasiswaId) {
+            $query->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
+                $q->where('id_mahasiswa', $mahasiswaId);
+            });
+        })
+            ->where('jenis_peserta', 'BIMBINGAN')
+            ->with('pesertaBimbingan.mataKuliah')
+            ->whereNotNull('nilai_huruf')
+            ->get();
+
+        $allNilai = $nilaiReguler->concat($nilaiBimbingan);
+
+        if ($allNilai->count() == 0) {
             return 3.0; // Default IPK untuk mahasiswa baru
         }
 
         $totalNilai = 0;
         $totalSks = 0;
 
-        foreach ($nilaiPerkuliahan as $nilai) {
+        foreach ($allNilai as $nilai) {
             $bobotNilai = $this->getBobotNilai($nilai->nilai_huruf);
-            $sks = $nilai->pesertaKelasKuliah->mataKuliah->sks_mata_kuliah;
+
+            if ($nilai->jenis_peserta === 'KELAS') {
+                $sks = $nilai->pesertaKelasKuliah->mataKuliah->sks_mata_kuliah;
+            } else {
+                $sks = $nilai->pesertaBimbingan->mataKuliah->sks_mata_kuliah;
+            }
 
             $totalNilai += ($bobotNilai * $sks);
             $totalSks += $sks;

@@ -11,6 +11,8 @@ return new class extends Migration
         Schema::create('dosen', function (Blueprint $table) {
             $table->uuid('id_dosen')->primary();
 
+            $table->string('foto')->nullable();
+
             // Biodata Dosen
             $table->string('nidn', 20)->unique();
             $table->enum('jenis_kelamin', ['L', 'P']);

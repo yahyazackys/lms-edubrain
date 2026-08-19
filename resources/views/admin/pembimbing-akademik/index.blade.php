@@ -109,10 +109,10 @@
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Angkatan
                                     </th>
-                                    <th scope="col"
+                                    {{-- <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Semester
-                                    </th>
+                                    </th> --}}
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Pembimbing Akademik
@@ -174,11 +174,11 @@
                                         </td>
 
                                         <!-- Semester -->
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        {{-- <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-xs font-medium text-gray-900">
                                                 {{ $mahasiswa->semester_mahasiswa }}
                                             </div>
-                                        </td>
+                                        </td> --}}
 
                                         <!-- Pembimbing Akademik -->
                                         <td class="px-6 py-4 whitespace-nowrap">

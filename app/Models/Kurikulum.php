@@ -18,8 +18,10 @@ class Kurikulum extends Model
     protected $fillable = [
         'nama_kurikulum',
         'jumlah_sks_lulus',
-        'jumlah_sks_wajib',
-        'jumlah_sks_pilihan',
+        'sks_mkwuupt_minimal',
+        'sks_mkwu_minimal',
+        'sks_mkwps_minimal',
+        'sks_mkp_minimal',
         'id_program_studi',
         'id_semester',
     ];
@@ -40,7 +42,7 @@ class Kurikulum extends Model
     public function mataKuliah()
     {
         return $this->belongsToMany(MataKuliah::class, 'kurikulum_mata_kuliah', 'id_kurikulum', 'id_mata_kuliah')
-            ->withPivot(['id', 'semester', 'jenis_mata_kuliah'])
+            ->withPivot(['id', 'semester', 'kategori_mata_kuliah'])
             ->withTimestamps();
     }
 }

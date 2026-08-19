@@ -66,7 +66,7 @@ class KelasKuliahController extends Controller
         }
 
         // Data untuk dropdown
-        $semesters = Semester::orderByDesc('tanggal_mulai')->where('is_active', true)->get();
+        $semesters = Semester::orderByDesc('tanggal_mulai')->get();
         $programStudis = ProgramStudi::with('jenjang')->orderBy('nama_program_studi')->get();
 
         return view('admin.kelas-kuliah.index', compact(
@@ -313,7 +313,8 @@ class KelasKuliahController extends Controller
         $kurikulumMataKuliahs = $query->select([
             'kurikulum_mata_kuliah.id',
             'kurikulum_mata_kuliah.semester as semester_mk',
-            'kurikulum_mata_kuliah.jenis_mata_kuliah',
+            'kurikulum_mata_kuliah.kategori_mata_kuliah', // ✅ Fix: Gunakan kategori_mata_kuliah dari kurikulum_mata_kuliah
+            'mata_kuliah.jenis_mata_kuliah',              // ✅ Fix: Ambil jenis_mata_kuliah dari mata_kuliah
             'mata_kuliah.kode_mata_kuliah',
             'mata_kuliah.nama_mata_kuliah',
             'mata_kuliah.sks_mata_kuliah',
@@ -332,11 +333,14 @@ class KelasKuliahController extends Controller
                     'nama_mata_kuliah' => $item->nama_mata_kuliah,
                     'sks_mata_kuliah' => $item->sks_mata_kuliah,
                     'semester_mk' => $item->semester_mk,
-                    'jenis_mata_kuliah' => $item->jenis_mata_kuliah,
+                    'kategori_mata_kuliah' => $item->kategori_mata_kuliah, // ✅ Fix: Kategori dari kurikulum_mata_kuliah
+                    'jenis_mata_kuliah' => $item->jenis_mata_kuliah,       // ✅ Fix: Jenis dari mata_kuliah
                     'program_studi' => $item->nama_program_studi,
                     'jenjang' => $item->kode_jenjang_pendidikan,
                     'kurikulum' => $item->nama_kurikulum,
-                    'nama_lengkap' => $item->kode_mata_kuliah . ' - ' . $item->nama_mata_kuliah . ' (Sem. ' . $item->semester_mk . ', ' . $item->sks_mata_kuliah . ' SKS, ' . $item->jenis_mata_kuliah . ')'
+                    'nama_lengkap' => $item->kode_mata_kuliah . ' - ' . $item->nama_mata_kuliah .
+                        ' (Sem. ' . $item->semester_mk . ', ' . $item->sks_mata_kuliah . ' SKS, ' .
+                        $item->jenis_mata_kuliah . ', ' . $item->kategori_mata_kuliah . ')'
                 ];
             });
 

@@ -48,4 +48,9 @@ class Semester extends Model
     {
         return $this->hasMany(RegistrasiMahasiswa::class, 'id_semester', 'id_semester');
     }
+
+    public function registrasiMahasiswa(): HasMany
+    {
+        return $this->hasMany(RegistrasiMahasiswa::class, 'id_semester', 'id_semester');
+    }
 }

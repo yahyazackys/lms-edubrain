@@ -13,6 +13,9 @@ return new class extends Migration
             $table->string('kode_mata_kuliah', 20)->unique();
             $table->string('nama_mata_kuliah', 150);
             $table->decimal('sks_mata_kuliah', 4, 2);
+
+            $table->enum('jenis_mata_kuliah', ['TEORI', 'PRAKTIKUM', 'MAGANG', 'KKN', 'SKRIPSI'])->default('TEORI')->index();
+
             $table->timestamps();
         });
     }

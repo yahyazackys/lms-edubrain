@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Mahasiswa;
 use App\Models\Semester;
 use App\Models\NilaiPerkuliahan;
-use App\Models\PesertaKelasKuliah;
 use Illuminate\Support\Collection;
 
 class KhsTranscriptService
@@ -94,26 +93,28 @@ class KhsTranscriptService
     }
 
     /**
-     * Ambil mata kuliah mahasiswa di semester tertentu
+     * Ambil mata kuliah berdasarkan semester (support dual jenis MK)
      */
     private function getMataKuliahBySemester(string $mahasiswaId, string $semesterId): Collection
     {
-        return NilaiPerkuliahan::with([
+        // Nilai dari mata kuliah reguler (TEORI, PRAKTIKUM)
+        $nilaiRegular = NilaiPerkuliahan::with([
             'pesertaKelasKuliah.kelasKuliah.kurikulumMataKuliah.mataKuliah',
             'pesertaKelasKuliah.kelasKuliah.semester',
             'pesertaKelasKuliah.registrasiMahasiswa'
         ])
+            ->where('jenis_peserta', 'KELAS')
             ->whereHas('pesertaKelasKuliah', function ($query) use ($mahasiswaId, $semesterId) {
                 $query->where('status_mata_kuliah', 'APPROVED')
                     ->whereHas('kelasKuliah', function ($q) use ($semesterId) {
                         $q->where('id_semester', $semesterId)
-                            ->where('status', 'selesai'); // Kelas sudah selesai
+                            ->where('status', 'selesai');
                     })
                     ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
                         $q->where('id_mahasiswa', $mahasiswaId);
                     });
             })
-            ->whereNotNull('nilai_indeks') // Sudah ada nilai
+            ->whereNotNull('nilai_indeks')
             ->get()
             ->map(function ($nilai) {
                 $peserta = $nilai->pesertaKelasKuliah;
@@ -123,36 +124,74 @@ class KhsTranscriptService
                     'kode_mata_kuliah' => $mataKuliah->kode_mata_kuliah,
                     'nama_mata_kuliah' => $mataKuliah->nama_mata_kuliah,
                     'sks' => $mataKuliah->sks_mata_kuliah,
-                    'jenis' => $peserta->kelasKuliah->kurikulumMataKuliah->jenis_mata_kuliah,
+                    'jenis' => $mataKuliah->jenis_mata_kuliah,
                     'nilai_angka' => $nilai->nilai_angka,
                     'nilai_huruf' => $nilai->nilai_huruf,
                     'nilai_indeks' => $nilai->nilai_indeks,
-                    'mutu' => $nilai->nilai_indeks * $mataKuliah->sks_mata_kuliah, // SKS x Indeks
+                    'mutu' => $nilai->nilai_indeks * $mataKuliah->sks_mata_kuliah,
                 ];
-            });
+            })
+            ->values(); // TAMBAHKAN INI
+
+        // Nilai dari mata kuliah bimbingan (KKN, MAGANG, SKRIPSI)
+        $nilaiBimbingan = NilaiPerkuliahan::with([
+            'pesertaBimbingan.mataKuliah',
+            'pesertaBimbingan.registrasiMahasiswa'
+        ])
+            ->where('jenis_peserta', 'BIMBINGAN')
+            ->whereHas('pesertaBimbingan', function ($query) use ($mahasiswaId, $semesterId) {
+                $query->where('status_mata_kuliah', 'APPROVED')
+                    ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId, $semesterId) {
+                        $q->where('id_mahasiswa', $mahasiswaId)
+                            ->where('id_semester', $semesterId);
+                    });
+            })
+            ->whereNotNull('nilai_indeks')
+            ->get()
+            ->map(function ($nilai) {
+                $peserta = $nilai->pesertaBimbingan;
+                $mataKuliah = $peserta->mataKuliah;
+
+                return [
+                    'kode_mata_kuliah' => $mataKuliah->kode_mata_kuliah,
+                    'nama_mata_kuliah' => $mataKuliah->nama_mata_kuliah,
+                    'sks' => $mataKuliah->sks_mata_kuliah,
+                    'jenis' => $mataKuliah->jenis_mata_kuliah,
+                    'nilai_angka' => $nilai->nilai_angka,
+                    'nilai_huruf' => $nilai->nilai_huruf,
+                    'nilai_indeks' => $nilai->nilai_indeks,
+                    'mutu' => $nilai->nilai_indeks * $mataKuliah->sks_mata_kuliah,
+                ];
+            })
+            ->values(); // TAMBAHKAN INI
+
+        // GUNAKAN concat INSTEAD OF merge
+        return $nilaiRegular->concat($nilaiBimbingan);
     }
 
     /**
-     * Ambil semua mata kuliah mahasiswa yang sudah lulus
+     * Ambil semua mata kuliah mahasiswa yang sudah lulus (support dual jenis MK)
      */
     private function getAllMataKuliahMahasiswa(string $mahasiswaId): Collection
     {
-        return NilaiPerkuliahan::with([
+        // Nilai dari mata kuliah reguler
+        $nilaiRegular = NilaiPerkuliahan::with([
             'pesertaKelasKuliah.kelasKuliah.kurikulumMataKuliah.mataKuliah',
             'pesertaKelasKuliah.kelasKuliah.semester',
             'pesertaKelasKuliah.registrasiMahasiswa'
         ])
+            ->where('jenis_peserta', 'KELAS')
             ->whereHas('pesertaKelasKuliah', function ($query) use ($mahasiswaId) {
                 $query->where('status_mata_kuliah', 'APPROVED')
                     ->whereHas('kelasKuliah', function ($q) {
-                        $q->where('status', 'selesai'); // Kelas sudah selesai
+                        $q->where('status', 'selesai');
                     })
                     ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
                         $q->where('id_mahasiswa', $mahasiswaId);
                     });
             })
-            ->whereNotNull('nilai_indeks') // Sudah ada nilai
-            ->where('nilai_huruf', '!=', 'E') // Tidak termasuk nilai E (tidak lulus)
+            ->whereNotNull('nilai_indeks')
+            ->where('nilai_huruf', '!=', 'E')
             ->get()
             ->map(function ($nilai) {
                 $peserta = $nilai->pesertaKelasKuliah;
@@ -163,14 +202,52 @@ class KhsTranscriptService
                     'kode_mata_kuliah' => $mataKuliah->kode_mata_kuliah,
                     'nama_mata_kuliah' => $mataKuliah->nama_mata_kuliah,
                     'sks' => $mataKuliah->sks_mata_kuliah,
-                    'jenis' => $peserta->kelasKuliah->kurikulumMataKuliah->jenis_mata_kuliah,
+                    'jenis' => $mataKuliah->jenis_mata_kuliah,
                     'semester_diambil' => $semester->nama_semester,
                     'nilai_angka' => $nilai->nilai_angka,
                     'nilai_huruf' => $nilai->nilai_huruf,
                     'nilai_indeks' => $nilai->nilai_indeks,
                     'mutu' => $nilai->nilai_indeks * $mataKuliah->sks_mata_kuliah,
                 ];
-            });
+            })
+            ->values(); // TAMBAHKAN INI
+
+        // Nilai dari mata kuliah bimbingan
+        $nilaiBimbingan = NilaiPerkuliahan::with([
+            'pesertaBimbingan.mataKuliah',
+            'pesertaBimbingan.registrasiMahasiswa.semester'
+        ])
+            ->where('jenis_peserta', 'BIMBINGAN')
+            ->whereHas('pesertaBimbingan', function ($query) use ($mahasiswaId) {
+                $query->where('status_mata_kuliah', 'APPROVED')
+                    ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
+                        $q->where('id_mahasiswa', $mahasiswaId);
+                    });
+            })
+            ->whereNotNull('nilai_indeks')
+            ->where('nilai_huruf', '!=', 'E')
+            ->get()
+            ->map(function ($nilai) {
+                $peserta = $nilai->pesertaBimbingan;
+                $mataKuliah = $peserta->mataKuliah;
+                $semester = $peserta->registrasiMahasiswa->semester;
+
+                return [
+                    'kode_mata_kuliah' => $mataKuliah->kode_mata_kuliah,
+                    'nama_mata_kuliah' => $mataKuliah->nama_mata_kuliah,
+                    'sks' => $mataKuliah->sks_mata_kuliah,
+                    'jenis' => $mataKuliah->jenis_mata_kuliah,
+                    'semester_diambil' => $semester->nama_semester,
+                    'nilai_angka' => $nilai->nilai_angka,
+                    'nilai_huruf' => $nilai->nilai_huruf,
+                    'nilai_indeks' => $nilai->nilai_indeks,
+                    'mutu' => $nilai->nilai_indeks * $mataKuliah->sks_mata_kuliah,
+                ];
+            })
+            ->values(); // TAMBAHKAN INI
+
+        // GUNAKAN concat INSTEAD OF merge
+        return $nilaiRegular->concat($nilaiBimbingan);
     }
 
     /**
@@ -189,19 +266,21 @@ class KhsTranscriptService
     }
 
     /**
-     * Hitung IPK kumulatif sampai semester tertentu
+     * Hitung IPK kumulatif sampai semester tertentu (support dual jenis MK)
      */
     private function hitungIpkKumulatif(string $mahasiswaId, string $semesterId): float
     {
-        // Ambil semua semester sampai semester yang diminta (berdasarkan kode semester)
+        // Ambil semester target
         $semesterTarget = Semester::find($semesterId);
         if (!$semesterTarget) return 0;
 
-        $allNilai = NilaiPerkuliahan::with([
+        // === NILAI DARI MATA KULIAH REGULER ===
+        $nilaiRegular = NilaiPerkuliahan::with([
             'pesertaKelasKuliah.kelasKuliah.kurikulumMataKuliah.mataKuliah',
             'pesertaKelasKuliah.kelasKuliah.semester',
             'pesertaKelasKuliah.registrasiMahasiswa'
         ])
+            ->where('jenis_peserta', 'KELAS')
             ->whereHas('pesertaKelasKuliah', function ($query) use ($mahasiswaId, $semesterTarget) {
                 $query->where('status_mata_kuliah', 'APPROVED')
                     ->whereHas('kelasKuliah', function ($q) use ($semesterTarget) {
@@ -218,15 +297,44 @@ class KhsTranscriptService
             ->where('nilai_huruf', '!=', 'E')
             ->get();
 
+        // === NILAI DARI MATA KULIAH BIMBINGAN ===
+        $nilaiBimbingan = NilaiPerkuliahan::with([
+            'pesertaBimbingan.mataKuliah',
+            'pesertaBimbingan.registrasiMahasiswa.semester'
+        ])
+            ->where('jenis_peserta', 'BIMBINGAN')
+            ->whereHas('pesertaBimbingan', function ($query) use ($mahasiswaId, $semesterTarget) {
+                $query->where('status_mata_kuliah', 'APPROVED')
+                    ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId, $semesterTarget) {
+                        $q->where('id_mahasiswa', $mahasiswaId)
+                            ->whereHas('semester', function ($s) use ($semesterTarget) {
+                                $s->where('kode_semester', '<=', $semesterTarget->kode_semester);
+                            });
+                    });
+            })
+            ->whereNotNull('nilai_indeks')
+            ->where('nilai_huruf', '!=', 'E')
+            ->get();
+
+        // === GABUNGKAN KEDUA COLLECTION ===
+        $allNilai = $nilaiRegular->merge($nilaiBimbingan);
+
         if ($allNilai->isEmpty()) {
             return 0;
         }
 
+        // === HITUNG TOTAL MUTU DAN SKS ===
         $totalMutu = 0;
         $totalSks = 0;
 
         foreach ($allNilai as $nilai) {
-            $sks = $nilai->pesertaKelasKuliah->kelasKuliah->kurikulumMataKuliah->mataKuliah->sks_mata_kuliah;
+            // Get SKS berdasarkan jenis peserta
+            if ($nilai->jenis_peserta === 'KELAS') {
+                $sks = $nilai->pesertaKelasKuliah->kelasKuliah->kurikulumMataKuliah->mataKuliah->sks_mata_kuliah;
+            } else {
+                $sks = $nilai->pesertaBimbingan->mataKuliah->sks_mata_kuliah;
+            }
+
             $totalMutu += $nilai->nilai_indeks * $sks;
             $totalSks += $sks;
         }
@@ -250,17 +358,27 @@ class KhsTranscriptService
     }
 
     /**
-     * Get daftar semester yang pernah diambil mahasiswa
+     * Get daftar semester yang pernah diambil mahasiswa (support dual jenis MK)
      */
     public function getSemesterMahasiswa(string $mahasiswaId): Collection
     {
-        return Semester::whereHas('kelasKuliah.pesertaKelasKuliah', function ($query) use ($mahasiswaId) {
-            $query->where('status_mata_kuliah', 'APPROVED')
-                ->whereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
-                    $q->where('id_mahasiswa', $mahasiswaId);
+        return Semester::where(function ($query) use ($mahasiswaId) {
+            // Semester dari mata kuliah reguler (TEORI, PRAKTIKUM)
+            $query->whereHas('kelasKuliah.pesertaKelasKuliah', function ($q) use ($mahasiswaId) {
+                $q->where('status_mata_kuliah', 'APPROVED')
+                    ->whereHas('registrasiMahasiswa', function ($subQ) use ($mahasiswaId) {
+                        $subQ->where('id_mahasiswa', $mahasiswaId);
+                    });
+            })
+                // ATAU Semester dari mata kuliah bimbingan (KKN, MAGANG, SKRIPSI)
+                ->orWhereHas('registrasiMahasiswa', function ($q) use ($mahasiswaId) {
+                    $q->where('id_mahasiswa', $mahasiswaId)
+                        ->whereHas('pesertaBimbingan', function ($subQ) {
+                            $subQ->where('status_mata_kuliah', 'APPROVED');
+                        });
                 });
         })
-            ->orderBy('kode_semester')
+            ->orderBy('kode_semester', 'desc')
             ->get(['id_semester', 'kode_semester', 'nama_semester']);
     }
 }

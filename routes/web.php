@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dosen\DosenBimbinganController;
 use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfileController;
@@ -13,6 +14,56 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+        // Profile Management
+        Route::get('/biodata', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'index'])->name('biodata.index');
+        Route::put('/biodata', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'update'])->name('biodata.update');
+        Route::put('/biodata/password', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'updatePassword'])->name('biodata.update-password');
+
+        // Photo Management
+        Route::post('/biodata/upload-photo', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'uploadPhoto'])->name('biodata.upload-photo');
+        Route::delete('/biodata/delete-photo', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'deletePhoto'])->name('biodata.delete-photo');
+
+        // API Endpoints
+        Route::get('/api/kurikulum', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'getKurikulumByProdi'])->name('biodata.api.kurikulum');
+        Route::get('/api/program-studi', [\App\Http\Controllers\Mahasiswa\BiodataController::class, 'getProgramStudi'])->name('biodata.api.program-studi');
+
+        // Dashboard Bimbingan
+        Route::get('/bimbingan', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'index'])
+            ->name('bimbingan.index');
+
+        // Detail Bimbingan untuk mata kuliah tertentu
+        Route::get('/bimbingan/{id_peserta_bimbingan}', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'detail'])
+            ->name('bimbingan.detail');
+
+        // Submit laporan untuk bab tertentu
+        Route::post('/bimbingan/{id_peserta_bimbingan}/bab/{id_laporan_bab}/submit', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'submitBab'])
+            ->name('bimbingan.submit');
+
+        // View submissions history untuk bab tertentu
+        Route::get('/bimbingan/{id_peserta_bimbingan}/bab/{id_laporan_bab}/submissions', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'viewSubmissions'])
+            ->name('bimbingan.submissions');
+
+        // Mahasiswa - KKN Kelompok
+        Route::get('/bimbingan/kelompok/{id_peserta_bimbingan}', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'viewKelompokDetail'])
+            ->name('bimbingan.kelompok.detail');
+        Route::post('/bimbingan/kelompok/{id_peserta_bimbingan}/upload', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'uploadDokumentasi'])
+            ->name('bimbingan.kelompok.upload-dokumentasi');
+        Route::delete('/bimbingan/kelompok/{id_peserta_bimbingan}/dokumentasi/{id_dokumentasi}', [App\Http\Controllers\Mahasiswa\MahasiswaBimbinganController::class, 'deleteDokumentasi'])
+            ->name('bimbingan.kelompok.delete-dokumentasi');
+    });
+
+    Route::prefix('dosen')->name('dosen.')->group(function () {
+        // Profile Management
+        Route::get('/biodata', [\App\Http\Controllers\Dosen\BiodataController::class, 'index'])->name('biodata.index');
+        Route::put('/biodata', [\App\Http\Controllers\Dosen\BiodataController::class, 'update'])->name('biodata.update');
+        Route::put('/biodata/password', [\App\Http\Controllers\Dosen\BiodataController::class, 'updatePassword'])->name('biodata.update-password');
+
+        // Photo Management
+        Route::post('/biodata/upload-photo', [\App\Http\Controllers\Dosen\BiodataController::class, 'uploadPhoto'])->name('biodata.upload-photo');
+        Route::delete('/biodata/delete-photo', [\App\Http\Controllers\Dosen\BiodataController::class, 'deletePhoto'])->name('biodata.delete-photo');
+    });
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -52,10 +103,26 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::middleware('role:admin')->group(function () {
+        Route::prefix('admin')->name('admin.')->group(function () {
+
+            // Profile routes
+            Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'index'])->name('profile.index');
+            Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updateProfile'])->name('profile.update');
+            Route::put('/profile/username', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updateUsername'])->name('profile.update-username');
+            Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updatePassword'])->name('profile.update-password');
+        });
+
         // Semester
         Route::resource('semester', \App\Http\Controllers\Admin\SemesterController::class);
         Route::patch('/semester/{id}/activate', [\App\Http\Controllers\Admin\SemesterController::class, 'activate'])->name('semester.activate');
         Route::patch('/semester/{id}/deactivate', [\App\Http\Controllers\Admin\SemesterController::class, 'deactivate'])->name('semester.deactivate');
+
+        // Import/Export Nilai Historis
+        Route::prefix('admin/nilai-historis')->name('admin.nilai-historis.')->middleware(['auth', 'role:admin'])->group(function () {
+            Route::get('/export-template', [\App\Http\Controllers\Admin\NilaiHistorisController::class, 'exportTemplate'])->name('export-template');
+            Route::get('/export', [\App\Http\Controllers\Admin\NilaiHistorisController::class, 'export'])->name('export');
+            Route::post('/import', [\App\Http\Controllers\Admin\NilaiHistorisController::class, 'import'])->name('import');
+        });
 
         // Jenjang Pendidikan
         Route::prefix('jenjang')->name('jenjang.')->group(function () {
@@ -82,6 +149,10 @@ Route::middleware('auth')->group(function () {
 
         // Mata Kuliah
         Route::prefix('mata-kuliah')->name('mata-kuliah.')->group(function () {
+            Route::get('/export-template', [\App\Http\Controllers\Admin\MataKuliahController::class, 'exportTemplate'])->name('export-template');
+            Route::get('/export', [\App\Http\Controllers\Admin\MataKuliahController::class, 'export'])->name('export');
+            Route::post('/import', [\App\Http\Controllers\Admin\MataKuliahController::class, 'import'])->name('import');
+
             Route::get('/', [\App\Http\Controllers\Admin\MataKuliahController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\MataKuliahController::class, 'store'])->name('store');
             Route::put('/{id}', [\App\Http\Controllers\Admin\MataKuliahController::class, 'update'])->name('update');
@@ -94,6 +165,11 @@ Route::middleware('auth')->group(function () {
 
         // Kurikulum
         Route::prefix('kurikulum')->name('kurikulum.')->group(function () {
+            Route::get('/export-template', [\App\Http\Controllers\Admin\KurikulumController::class, 'exportTemplate'])->name('export-template');
+            Route::get('/export', [\App\Http\Controllers\Admin\KurikulumController::class, 'export'])->name('export');
+            Route::post('/import', [\App\Http\Controllers\Admin\KurikulumController::class, 'import'])->name('import');
+
+
             Route::get('/', [\App\Http\Controllers\Admin\KurikulumController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\KurikulumController::class, 'store'])->name('store');
             Route::put('/{id}', [\App\Http\Controllers\Admin\KurikulumController::class, 'update'])->name('update');
@@ -107,6 +183,11 @@ Route::middleware('auth')->group(function () {
         // Kurikulum Mata Kuliah Management
         Route::prefix('kurikulum/{kurikulum}')->name('kurikulum.')->group(function () {
             Route::prefix('mata-kuliah')->name('mata-kuliah.')->group(function () {
+                Route::get('/export-template', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'exportTemplate'])->name('export-template');
+                Route::get('/export', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'export'])->name('export');
+                Route::post('/import', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'import'])->name('import');
+
+
                 Route::get('/', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'index'])->name('index');
                 Route::post('/', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'store'])->name('store');
                 Route::put('/{mataKuliah}', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'update'])->name('update');
@@ -117,12 +198,17 @@ Route::middleware('auth')->group(function () {
                 Route::post('/copy', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'copy'])->name('copy');
 
                 // API
-                Route::get('/api/mata-kuliah', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'getMataKuliah'])->name('api.mata-kuliah');
+                Route::get('/api/mata-kuliah', [\App\Http\Controllers\Admin\KurikulumMataKuliahController::class, 'getMataKuliah'])->name('getMataKuliah');
             });
         });
 
         // Mahasiswa
         Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+            Route::get('/export-template', [\App\Http\Controllers\Admin\MahasiswaController::class, 'exportTemplate'])->name('export-template');
+            Route::get('/export', [\App\Http\Controllers\Admin\MahasiswaController::class, 'export'])->name('export');
+            Route::post('/import', [\App\Http\Controllers\Admin\MahasiswaController::class, 'import'])->name('import');
+
+
             // Main CRUD Routes
             Route::get('/', [\App\Http\Controllers\Admin\MahasiswaController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\MahasiswaController::class, 'store'])->name('store');
@@ -133,12 +219,12 @@ Route::middleware('auth')->group(function () {
             // Detail Update Route (untuk update lengkap dari halaman show)
             Route::put('/{id}/detail', [\App\Http\Controllers\Admin\MahasiswaController::class, 'updateDetail'])->name('update-detail');
 
+            // Foto
+            Route::post('/{id}/upload-photo', [\App\Http\Controllers\Admin\MahasiswaController::class, 'uploadPhoto'])->name('upload-photo');
+            Route::delete('/{id}/delete-photo', [\App\Http\Controllers\Admin\MahasiswaController::class, 'deletePhoto'])->name('delete-photo');
+
             // Reset Password Route
             Route::post('/{id}/reset-password', [\App\Http\Controllers\Admin\MahasiswaController::class, 'resetPassword'])->name('reset-password');
-
-            // Excel Import/Export Routes
-            Route::get('/template/export', [\App\Http\Controllers\Admin\MahasiswaController::class, 'exportTemplate'])->name('export-template');
-            Route::post('/import', [\App\Http\Controllers\Admin\MahasiswaController::class, 'import'])->name('import');
 
             // API Routes untuk AJAX calls
             Route::prefix('api')->name('api.')->group(function () {
@@ -149,6 +235,10 @@ Route::middleware('auth')->group(function () {
 
         // Dosen 
         Route::prefix('dosen')->name('dosen.')->group(function () {
+            Route::get('/export', [\App\Http\Controllers\Admin\DosenController::class, 'export'])->name('export');
+            Route::get('/export-template', [\App\Http\Controllers\Admin\DosenController::class, 'exportTemplate'])->name('export-template');
+            Route::post('/import', [\App\Http\Controllers\Admin\DosenController::class, 'import'])->name('import');
+
             // Main CRUD Routes
             Route::get('/', [\App\Http\Controllers\Admin\DosenController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Admin\DosenController::class, 'store'])->name('store');
@@ -162,10 +252,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{dosen}/reset-password', [\App\Http\Controllers\Admin\DosenController::class, 'resetPassword'])->name('reset-password');
             // Upload foto dosen
             Route::post('/{dosen}/upload-photo', [\App\Http\Controllers\Admin\DosenController::class, 'uploadPhoto'])->name('upload-photo');
-            // Export template Excel
-            Route::get('/export-template', [\App\Http\Controllers\Admin\DosenController::class, 'exportTemplate'])->name('export-template');
-            // Import dosen dari Excel
-            Route::post('/import', [\App\Http\Controllers\Admin\DosenController::class, 'import'])->name('import');
+
             // API Routes untuk AJAX
             Route::prefix('api')->name('api.')->group(function () {
                 // Get program studi untuk dropdown
@@ -239,6 +326,7 @@ Route::middleware('auth')->group(function () {
                 Route::delete('{kalenderAkademik}', 'destroy')->name('destroy');
             });
 
+
         // Pengumuman
         Route::prefix('pengumuman')
             ->name('pengumuman.')
@@ -248,9 +336,72 @@ Route::middleware('auth')->group(function () {
                 Route::put('{pengumuman}', 'update')->name('update');
                 Route::delete('{pengumuman}', 'destroy')->name('destroy');
             });
+
+        Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
+
+            // KKN Routes
+            Route::prefix('kkn')->name('kkn.')->group(function () {
+                // Kelompok KKN
+                Route::prefix('kelompok')->name('kelompok.')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Admin\KknKelompokController::class, 'index'])->name('index');
+                    Route::post('/', [\App\Http\Controllers\Admin\KknKelompokController::class, 'store'])->name('store');
+                    Route::get('/{id}/detail', [\App\Http\Controllers\Admin\KknKelompokController::class, 'show'])->name('show');
+                    Route::put('/{id}', [\App\Http\Controllers\Admin\KknKelompokController::class, 'update'])->name('update');
+                    Route::delete('/{id}', [\App\Http\Controllers\Admin\KknKelompokController::class, 'destroy'])->name('destroy');
+
+                    // API routes
+                    Route::prefix('api')->name('api.')->group(function () {
+                        Route::get('dosen', [\App\Http\Controllers\Admin\KknKelompokController::class, 'getDosen'])->name('dosen');
+                        Route::get('dosen/{id}', [\App\Http\Controllers\Admin\KknKelompokController::class, 'getDosenDetail'])->name('dosen-detail');
+                    });
+                });
+
+                // Peserta KKN
+                Route::prefix('peserta')->name('peserta.')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Admin\KknPesertaController::class, 'index'])->name('index');
+                    Route::post('/assign', [\App\Http\Controllers\Admin\KknPesertaController::class, 'assignMahasiswa'])->name('assign');
+                    Route::post('/remove', [\App\Http\Controllers\Admin\KknPesertaController::class, 'removeMahasiswa'])->name('remove');
+                    Route::post('/update-peran', [\App\Http\Controllers\Admin\KknPesertaController::class, 'updatePeran'])->name('update-peran');
+
+                    // API routes
+                    Route::prefix('api')->name('api.')->group(function () {
+                        Route::get('kelompok', [\App\Http\Controllers\Admin\KknPesertaController::class, 'getKelompok'])->name('kelompok');
+                        Route::get('mahasiswa-tersedia', [\App\Http\Controllers\Admin\KknPesertaController::class, 'getMahasiswaTersedia'])->name('mahasiswa-tersedia');
+                    });
+                });
+            });
+
+            // Magang Routes
+            Route::prefix('magang')->name('magang.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\MagangBimbinganController::class, 'index'])->name('index');
+                Route::post('/assign-pembimbing', [\App\Http\Controllers\Admin\MagangBimbinganController::class, 'assignPembimbing'])->name('assign-pembimbing');
+                Route::put('/{id}/update-pembimbing', [\App\Http\Controllers\Admin\MagangBimbinganController::class, 'updatePembimbing'])->name('update-pembimbing');
+
+                // API routes
+                Route::prefix('api')->name('api.')->group(function () {
+                    Route::get('dosen', [\App\Http\Controllers\Admin\MagangBimbinganController::class, 'getDosen'])->name('dosen');
+                    Route::get('mahasiswa-magang', [\App\Http\Controllers\Admin\MagangBimbinganController::class, 'getMahasiswaMagang'])->name('mahasiswa-magang');
+                });
+            });
+
+            // Skripsi Routes
+            Route::prefix('skripsi')->name('skripsi.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'index'])->name('index');
+                Route::post('/assign-pembimbing', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'assignPembimbing'])->name('assign-pembimbing');
+                Route::put('/{id}/update-pembimbing', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'updatePembimbing'])->name('update-pembimbing');
+                Route::post('/{id}/set-jadwal', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'setJadwal'])->name('set-jadwal');
+
+                // API routes
+                Route::prefix('api')->name('api.')->group(function () {
+                    Route::get('dosen', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'getDosen'])->name('dosen');
+                    Route::get('mahasiswa-skripsi', [\App\Http\Controllers\Admin\SkripsiBimbinganController::class, 'getMahasiswaSkripsi'])->name('mahasiswa-skripsi');
+                });
+            });
+        });
     });
 
     Route::middleware(['role:mahasiswa'])->group(function () {
+
         Route::prefix('krs')->name('krs.')->group(function () {
             // Dashboard KRS Mahasiswa
             Route::get('/', [\App\Http\Controllers\KrsController::class, 'index'])->name('index');
@@ -298,6 +449,42 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware(['role:dosen'])->group(function () {
+
+        Route::get('api/dosen/bimbingan/{id_peserta_bimbingan}/bab/{id_laporan_bab}/submissions', [DosenBimbinganController::class, 'getBabSubmissions'])->name('api.dosen.bab.submissions');
+
+        Route::prefix('dosen.bimbingan')->name('dosen.bimbingan.')->group(function () {
+
+            // List mahasiswa bimbingan (dengan tab KKN, Magang, Skripsi)
+            Route::get('/', [DosenBimbinganController::class, 'index'])->name('index');
+
+            // Detail kelompok KKN (khusus untuk KKN)
+            Route::get('/kelompok/{id_kelompok_kkn}', [DosenBimbinganController::class, 'detailKelompok'])->name('kelompok');
+
+            // Detail progress mahasiswa dan management bab
+            Route::get('/{id_peserta_bimbingan}', [DosenBimbinganController::class, 'detail'])->name('detail');
+
+            Route::get('/{peserta}/submissions/{bab}', [DosenBimbinganController::class, 'getSubmissions'])->name('submissions');
+
+            // Store nilai akhir bimbingan
+            Route::post('/nilai', [DosenBimbinganController::class, 'storeNilai'])->name('store-nilai');
+
+            // Management Bab Routes
+            Route::prefix('{id_peserta_bimbingan}/bab')->name('bab.')->group(function () {
+
+                // Tambah bab baru
+                Route::post('/', [DosenBimbinganController::class, 'storeBab'])->name('store');
+
+                // Update bab
+                Route::put('/{id_laporan_bab}', [DosenBimbinganController::class, 'updateBab'])->name('update');
+
+                // Delete bab
+                Route::delete('/{id_laporan_bab}', [DosenBimbinganController::class, 'deleteBab'])->name('delete');
+
+                // Review bab (approve/reject)
+                Route::post('/{id_laporan_bab}/review', [DosenBimbinganController::class, 'reviewBab'])->name('review');
+            });
+        });
+
         Route::prefix('krs/approval')->name('krs.approval.')->group(function () {
             // Dashboard PA untuk Approval KRS
             Route::get('/', [\App\Http\Controllers\KrsApprovalController::class, 'index'])->name('index');

@@ -14,13 +14,13 @@
                             <!-- Avatar dengan Upload Feature -->
                             <div class="flex-shrink-0 relative group">
                                 <!-- Foto Profile -->
-                                <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center relative cursor-pointer overflow-hidden"
+                                <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center relative cursor-pointer overflow-hidden"
                                     onclick="openPhotoUpload()">
                                     @if ($mahasiswa->foto)
                                         <img src="{{ asset('storage/foto-mahasiswa/' . $mahasiswa->foto) }}"
                                             alt="{{ $mahasiswa->pengguna->nama }}" class="w-full h-full object-cover">
                                     @else
-                                        <span class="text-xl font-bold text-gray-700">
+                                        <span class="text-2xl font-bold text-gray-700">
                                             {{ strtoupper(substr($mahasiswa->pengguna->nama, 0, 2)) }}
                                         </span>
                                     @endif
@@ -35,8 +35,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Camera Icon (dipisah dari foto biar gak ketutup overflow) -->
-                                <div class="absolute -bottom-1 -right-1 bg-gray-600 rounded-full p-1.5 border-2 border-white z-10 cursor-pointer"
+                                <!-- Camera Icon -->
+                                <div class="absolute -bottom-1 -right-1 bg-gray-600 rounded-full p-2 border-2 border-white z-10 cursor-pointer"
                                     onclick="openPhotoUpload()">
                                     <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -50,23 +50,22 @@
                                 </div>
                             </div>
 
-
                             <!-- Detail -->
                             <div class="flex-1 min-w-0">
-                                <h1 class="text-xl font-semibold font-heading text-gray-900 truncate">
+                                <h1 class="text-lg font-semibold font-heading text-gray-900 truncate">
                                     {{ $mahasiswa->pengguna->nama }}
                                 </h1>
                                 <div class="flex sm:flex-row flex-col items-start sm:items-center gap-x-4 gap-y-1">
                                     <div class="flex items-center text-sm text-gray-600 gap-1">
-                                        <i class="fa-solid fa-circle text-[8px]"></i>
+                                        <i class="fa-solid fa-id-card text-gray-500"></i>
                                         {{ $mahasiswa->nim }}
                                     </div>
                                     <div class="flex items-center text-sm text-gray-600 gap-1">
-                                        <i class="fa-solid fa-circle text-[8px]"></i>
+                                        <i class="fa-solid fa-graduation-cap text-gray-500"></i>
                                         {{ $mahasiswa->programStudi->nama_program_studi }}
                                     </div>
                                     <div class="flex items-center text-sm text-gray-600 gap-1">
-                                        <i class="fa-solid fa-circle text-[8px]"></i>
+                                        <i class="fa-solid fa-calendar text-gray-500"></i>
                                         Angkatan {{ $mahasiswa->angkatan }}
                                     </div>
                                     <div>
@@ -92,13 +91,12 @@
 
                         <!-- Action Buttons -->
                         <div class="mt-6 lg:mt-0">
-                            <!-- Container untuk semua tombol -->
                             <div class="flex flex-wrap gap-3">
                                 <!-- Container untuk tombol Edit dan Reset yang sejajar di mobile -->
                                 <div class="flex gap-3 w-full lg:w-auto">
                                     <!-- Edit Mode Toggle -->
                                     <button id="toggleEditBtn" onclick="toggleEditMode()"
-                                        class="flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                        class="flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -120,7 +118,7 @@
 
                                 <!-- Tombol Kembali -->
                                 <a href="{{ route('mahasiswa.index') }}"
-                                    class="w-full lg:w-auto inline-flex justify-center px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900">
+                                    class="w-full lg:w-auto inline-flex justify-center items-center px-4 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -145,64 +143,33 @@
                                 <button onclick="switchTab('data-utama')"
                                     class="tab-button active whitespace-nowrap flex-shrink-0 py-3 px-4 border-b-2 font-medium text-sm"
                                     id="tab-data-utama">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
-                                    </svg>
+                                    <i class="fas fa-user w-4 h-4 inline mr-2"></i>
                                     Data Utama
                                 </button>
                                 <button onclick="switchTab('data-pribadi')"
                                     class="tab-button whitespace-nowrap flex-shrink-0 py-3 px-4 border-b-2 font-medium text-sm"
                                     id="tab-data-pribadi">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
+                                    <i class="fas fa-id-card w-4 h-4 inline mr-2"></i>
                                     Data Pribadi
                                 </button>
                                 <button onclick="switchTab('data-orangtua')"
                                     class="tab-button whitespace-nowrap flex-shrink-0 py-3 px-4 border-b-2 font-medium text-sm"
                                     id="tab-data-orangtua">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
-                                        </path>
-                                    </svg>
+                                    <i class="fas fa-users w-4 h-4 inline mr-2"></i>
                                     Data Orangtua
                                 </button>
                                 <button onclick="switchTab('data-wali')"
                                     class="tab-button whitespace-nowrap flex-shrink-0 py-3 px-4 border-b-2 font-medium text-sm"
                                     id="tab-data-wali">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
+                                    <i class="fas fa-user-tie w-4 h-4 inline mr-2"></i>
                                     Data Wali
                                 </button>
                                 <button onclick="switchTab('akun-pengguna')"
                                     class="tab-button whitespace-nowrap flex-shrink-0 py-3 px-4 border-b-2 font-medium text-sm"
                                     id="tab-akun-pengguna">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
+                                    <i class="fas fa-address-book w-4 h-4 inline mr-2"></i>
                                     Akun Pengguna
                                 </button>
-                            </div>
-
-                            <!-- Scroll Indicators -->
-                            <div id="scroll-left"
-                                class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none opacity-0 transition-opacity duration-200">
-                            </div>
-                            <div id="scroll-right"
-                                class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none transition-opacity duration-200">
                             </div>
                         </div>
                     </div>
@@ -212,49 +179,31 @@
                         <button onclick="switchTab('data-utama')"
                             class="tab-button active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                             id="tab-data-utama-desktop">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
+                            <i class="fas fa-user w-4 h-4 inline mr-2"></i>
                             Data Utama
                         </button>
                         <button onclick="switchTab('data-pribadi')"
                             class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                             id="tab-data-pribadi-desktop">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
+                            <i class="fas fa-id-card w-4 h-4 inline mr-2"></i>
                             Data Pribadi
                         </button>
                         <button onclick="switchTab('data-orangtua')"
                             class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                             id="tab-data-orangtua-desktop">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
-                                </path>
-                            </svg>
+                            <i class="fas fa-users w-4 h-4 inline mr-2"></i>
                             Data Orangtua
                         </button>
                         <button onclick="switchTab('data-wali')"
                             class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                             id="tab-data-wali-desktop">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
+                            <i class="fas fa-user-tie w-4 h-4 inline mr-2"></i>
                             Data Wali
                         </button>
                         <button onclick="switchTab('akun-pengguna')"
                             class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                             id="tab-akun-pengguna-desktop">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                </path>
-                            </svg>
+                            <i class="fas fa-address-book w-4 h-4 inline mr-2"></i>
                             Akun Pengguna
                         </button>
                     </nav>
@@ -270,7 +219,7 @@
                     <div id="content-data-utama" class="tab-content active">
                         <div class="p-4 sm:p-6">
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-medium text-gray-900">Data Utama Mahasiswa</h3>
+                                <h3 class="text-base font-medium text-gray-900">Data Utama Mahasiswa</h3>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -280,7 +229,7 @@
                                         NIM <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="nim" id="nim" value="{{ $mahasiswa->nim }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="20" required disabled>
                                 </div>
 
@@ -291,7 +240,7 @@
                                     </label>
                                     <input type="text" name="nama" id="nama"
                                         value="{{ $mahasiswa->pengguna->nama }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="150" required disabled>
                                 </div>
 
@@ -303,8 +252,8 @@
                                     <div class="relative">
                                         <input type="text" id="program_studi_search"
                                             value="{{ $mahasiswa->programStudi->kode_program_studi }} - {{ $mahasiswa->programStudi->jenjang->kode_jenjang_pendidikan }} {{ $mahasiswa->programStudi->nama_program_studi }}"
-                                            placeholder="Contoh: Cari program studi..." autocomplete="off"
-                                            class="form-input w-full text-xs px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            placeholder="Cari program studi..." autocomplete="off"
+                                            class="form-input w-full text-xs px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             disabled>
 
                                         <button type="button" id="clear_program_studi"
@@ -344,15 +293,14 @@
                                         Kurikulum <span class="text-red-500">*</span>
                                     </label>
                                     <select name="id_kurikulum" id="id_kurikulum"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         required disabled>
                                         <option value="">Pilih kurikulum...</option>
                                         @foreach ($kurikulums as $kurikulum)
                                             <option value="{{ $kurikulum->id_kurikulum }}"
                                                 {{ $mahasiswa->id_kurikulum == $kurikulum->id_kurikulum ? 'selected' : '' }}>
                                                 {{ $kurikulum->nama_kurikulum }}
-                                                ({{ $kurikulum->semester->nama_semester }})
-                                                -
+                                                ({{ $kurikulum->semester->nama_semester }}) -
                                                 {{ $kurikulum->jumlah_sks_lulus }} SKS
                                             </option>
                                         @endforeach
@@ -366,7 +314,7 @@
                                     </label>
                                     <input type="number" name="angkatan" id="angkatan"
                                         value="{{ $mahasiswa->angkatan }}" min="2000" max="{{ date('Y') + 1 }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         required disabled>
                                 </div>
 
@@ -376,7 +324,7 @@
                                         Status Mahasiswa <span class="text-red-500">*</span>
                                     </label>
                                     <select name="status_mahasiswa" id="status_mahasiswa"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         required disabled>
                                         @foreach ($statusOptions as $key => $label)
                                             <option value="{{ $key }}"
@@ -393,9 +341,7 @@
                     <!-- Tab 2: Data Pribadi -->
                     <div id="content-data-pribadi" class="tab-content hidden">
                         <div class="p-4 sm:p-6">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-medium text-gray-900">Data Pribadi</h3>
-                            </div>
+                            <h3 class="text-base font-medium text-gray-900 mb-6">Data Pribadi & Alamat</h3>
 
                             <!-- Biodata -->
                             <div class="mb-8">
@@ -405,15 +351,15 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Jenis Kelamin</label>
                                         <select name="jenis_kelamin" id="jenis_kelamin"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             disabled>
                                             <option value="">Pilih jenis kelamin</option>
                                             <option value="L"
-                                                {{ $mahasiswa->jenis_kelamin === 'L' ? 'selected' : '' }}>Laki-laki
-                                            </option>
+                                                {{ $mahasiswa->jenis_kelamin === 'L' ? 'selected' : '' }}>
+                                                Laki-laki</option>
                                             <option value="P"
-                                                {{ $mahasiswa->jenis_kelamin === 'P' ? 'selected' : '' }}>Perempuan
-                                            </option>
+                                                {{ $mahasiswa->jenis_kelamin === 'P' ? 'selected' : '' }}>
+                                                Perempuan</option>
                                         </select>
                                     </div>
 
@@ -422,7 +368,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Tempat Lahir</label>
                                         <input type="text" name="tempat_lahir" id="tempat_lahir"
                                             value="{{ $mahasiswa->tempat_lahir }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Jakarta" disabled>
                                     </div>
 
@@ -431,7 +377,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Tanggal Lahir</label>
                                         <input type="date" name="tanggal_lahir" id="tanggal_lahir"
                                             value="{{ $mahasiswa->tanggal_lahir }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             disabled>
                                     </div>
 
@@ -440,7 +386,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">NIK (16 digit)</label>
                                         <input type="text" name="nik" id="nik"
                                             value="{{ $mahasiswa->nik }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="16" minlength="16" pattern="[0-9]{16}"
                                             placeholder="Contoh: 1234567890123456" disabled>
                                     </div>
@@ -450,7 +396,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">NISN</label>
                                         <input type="text" name="nisn" id="nisn"
                                             value="{{ $mahasiswa->nisn }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="20" placeholder="Contoh: 1234567890" disabled>
                                     </div>
 
@@ -459,7 +405,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">NPWP</label>
                                         <input type="text" name="npwp" id="npwp"
                                             value="{{ $mahasiswa->npwp }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="20" placeholder="Contoh: 123456789012345" disabled>
                                     </div>
 
@@ -468,7 +414,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Agama</label>
                                         <input type="text" name="agama" id="agama"
                                             value="{{ $mahasiswa->agama }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="50" placeholder="Contoh: Islam" disabled>
                                     </div>
                                 </div>
@@ -483,7 +429,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Alamat Jalan</label>
                                         <input type="text" name="jalan" id="jalan"
                                             value="{{ $mahasiswa->jalan }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="255" placeholder="Contoh: Jl. Sudirman No. 123" disabled>
                                     </div>
 
@@ -492,7 +438,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Dusun</label>
                                         <input type="text" name="dusun" id="dusun"
                                             value="{{ $mahasiswa->dusun }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Kebon Jeruk" disabled>
                                     </div>
 
@@ -501,7 +447,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">RT</label>
                                         <input type="text" name="rt" id="rt"
                                             value="{{ $mahasiswa->rt }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="3" placeholder="Contoh: 001" disabled>
                                     </div>
 
@@ -510,7 +456,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">RW</label>
                                         <input type="text" name="rw" id="rw"
                                             value="{{ $mahasiswa->rw }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="3" placeholder="Contoh: 002" disabled>
                                     </div>
 
@@ -519,7 +465,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Kelurahan</label>
                                         <input type="text" name="kelurahan" id="kelurahan"
                                             value="{{ $mahasiswa->kelurahan }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Kebon Jeruk" disabled>
                                     </div>
 
@@ -528,7 +474,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Kode Pos</label>
                                         <input type="text" name="kode_pos" id="kode_pos"
                                             value="{{ $mahasiswa->kode_pos }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="10" placeholder="Contoh: 12345" disabled>
                                     </div>
                                 </div>
@@ -539,18 +485,12 @@
                     <!-- Tab 3: Data Orangtua -->
                     <div id="content-data-orangtua" class="tab-content hidden">
                         <div class="p-4 sm:p-6">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-medium text-gray-900">Data Orangtua</h3>
-                            </div>
+                            <h3 class="text-base font-medium text-gray-900 mb-6">Data Orangtua</h3>
 
                             <!-- Data Ayah -->
                             <div class="mb-8">
                                 <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
+                                    <i class="fas fa-male text-blue-600 mr-2"></i>
                                     Data Ayah
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -558,7 +498,7 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700 mb-2">NIK Ayah</label>
                                         <input type="text" name="nik_ayah" value="{{ $mahasiswa->nik_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="16" minlength="16" pattern="[0-9]{16}"
                                             placeholder="Contoh: 1234567890123456" disabled>
                                     </div>
@@ -567,7 +507,7 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Nama Ayah</label>
                                         <input type="text" name="nama_ayah" value="{{ $mahasiswa->nama_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="150" placeholder="Contoh: Budi Santoso" disabled>
                                     </div>
 
@@ -577,7 +517,7 @@
                                             Ayah</label>
                                         <input type="text" name="tempat_lahir_ayah"
                                             value="{{ $mahasiswa->tempat_lahir_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Bandung" disabled>
                                     </div>
 
@@ -587,7 +527,7 @@
                                             Ayah</label>
                                         <input type="date" name="tanggal_lahir_ayah"
                                             value="{{ $mahasiswa->tanggal_lahir_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             disabled>
                                     </div>
 
@@ -596,7 +536,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Pendidikan Ayah</label>
                                         <input type="text" name="nama_pendidikan_ayah"
                                             value="{{ $mahasiswa->nama_pendidikan_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: SMA" disabled>
                                     </div>
 
@@ -605,7 +545,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Pekerjaan Ayah</label>
                                         <input type="text" name="nama_pekerjaan_ayah"
                                             value="{{ $mahasiswa->nama_pekerjaan_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Wiraswasta" disabled>
                                     </div>
 
@@ -615,7 +555,7 @@
                                             Ayah</label>
                                         <input type="text" name="nama_penghasilan_ayah" id="penghasilan_ayah"
                                             value="{{ $mahasiswa->nama_penghasilan_ayah }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Rp 5.000.000" disabled>
                                     </div>
                                 </div>
@@ -624,11 +564,7 @@
                             <!-- Data Ibu -->
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                                    <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
+                                    <i class="fas fa-female text-pink-600 mr-2"></i>
                                     Data Ibu
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -636,7 +572,7 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700 mb-2">NIK Ibu</label>
                                         <input type="text" name="nik_ibu" value="{{ $mahasiswa->nik_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="16" minlength="16" pattern="[0-9]{16}"
                                             placeholder="Contoh: 1234567890123456" disabled>
                                     </div>
@@ -645,7 +581,7 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Nama Ibu</label>
                                         <input type="text" name="nama_ibu" value="{{ $mahasiswa->nama_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="150" placeholder="Contoh: Siti Aminah" disabled>
                                     </div>
 
@@ -655,7 +591,7 @@
                                             Ibu</label>
                                         <input type="text" name="tempat_lahir_ibu"
                                             value="{{ $mahasiswa->tempat_lahir_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Surabaya" disabled>
                                     </div>
 
@@ -665,7 +601,7 @@
                                             Ibu</label>
                                         <input type="date" name="tanggal_lahir_ibu"
                                             value="{{ $mahasiswa->tanggal_lahir_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             disabled>
                                     </div>
 
@@ -674,7 +610,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Pendidikan Ibu</label>
                                         <input type="text" name="nama_pendidikan_ibu"
                                             value="{{ $mahasiswa->nama_pendidikan_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: SMA" disabled>
                                     </div>
 
@@ -683,7 +619,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Pekerjaan Ibu</label>
                                         <input type="text" name="nama_pekerjaan_ibu"
                                             value="{{ $mahasiswa->nama_pekerjaan_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Ibu Rumah Tangga" disabled>
                                     </div>
 
@@ -692,7 +628,7 @@
                                         <label class="block text-xs font-medium text-gray-700 mb-2">Penghasilan Ibu</label>
                                         <input type="text" name="nama_penghasilan_ibu" id="penghasilan_ibu"
                                             value="{{ $mahasiswa->nama_penghasilan_ibu }}"
-                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                            class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                             maxlength="100" placeholder="Contoh: Rp 2.000.000" disabled>
                                     </div>
                                 </div>
@@ -704,7 +640,8 @@
                     <div id="content-data-wali" class="tab-content hidden">
                         <div class="p-4 sm:p-6">
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-medium text-gray-900">Data Wali</h3>
+                                <h3 class="text-base font-medium text-gray-900">Data Wali</h3>
+                                <p class="text-xs text-gray-500">Data wali (opsional)</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -712,27 +649,25 @@
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 mb-2">Nama Wali</label>
                                     <input type="text" name="nama_wali" value="{{ $mahasiswa->nama_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="150" placeholder="Contoh: Ahmad Supriyadi" disabled>
                                 </div>
 
                                 <!-- Tempat Lahir Wali -->
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">Tempat Lahir
-                                        Wali</label>
+                                    <label class="block text-xs font-medium text-gray-700 mb-2">Tempat Lahir Wali</label>
                                     <input type="text" name="tempat_lahir_wali"
                                         value="{{ $mahasiswa->tempat_lahir_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="100" placeholder="Contoh: Medan" disabled>
                                 </div>
 
                                 <!-- Tanggal Lahir Wali -->
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">Tanggal Lahir
-                                        Wali</label>
+                                    <label class="block text-xs font-medium text-gray-700 mb-2">Tanggal Lahir Wali</label>
                                     <input type="date" name="tanggal_lahir_wali"
                                         value="{{ $mahasiswa->tanggal_lahir_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         disabled>
                                 </div>
 
@@ -741,7 +676,7 @@
                                     <label class="block text-xs font-medium text-gray-700 mb-2">Pendidikan Wali</label>
                                     <input type="text" name="nama_pendidikan_wali"
                                         value="{{ $mahasiswa->nama_pendidikan_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="100" placeholder="Contoh: S1" disabled>
                                 </div>
 
@@ -750,17 +685,16 @@
                                     <label class="block text-xs font-medium text-gray-700 mb-2">Pekerjaan Wali</label>
                                     <input type="text" name="nama_pekerjaan_wali"
                                         value="{{ $mahasiswa->nama_pekerjaan_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="100" placeholder="Contoh: PNS" disabled>
                                 </div>
 
                                 <!-- Penghasilan Wali -->
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-2">Penghasilan
-                                        Wali</label>
+                                    <label class="block text-xs font-medium text-gray-700 mb-2">Penghasilan Wali</label>
                                     <input type="text" name="nama_penghasilan_wali" id="penghasilan_wali"
                                         value="{{ $mahasiswa->nama_penghasilan_wali }}"
-                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                        class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                         maxlength="100" placeholder="Contoh: Rp 3.500.000" disabled>
                                 </div>
                             </div>
@@ -770,27 +704,21 @@
                     <!-- Tab 5: Akun Pengguna -->
                     <div id="content-akun-pengguna" class="tab-content hidden">
                         <div class="p-4 sm:p-6">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-medium text-gray-900">Akun Pengguna</h3>
-                            </div>
+                            <h3 class="text-base font-medium text-gray-900 mb-6">Data Kontak & Akun</h3>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Info Login -->
                                 <div class="bg-gray-50 p-4 rounded-lg">
                                     <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                            </path>
-                                        </svg>
+                                        <i class="fas fa-lock text-gray-500 mr-2"></i>
                                         Informasi Login
                                     </h4>
                                     <div class="space-y-3">
                                         <div>
                                             <label class="block text-xs font-medium text-gray-700 mb-1">Username</label>
                                             <div class="text-xs text-gray-900 bg-white p-2 rounded border">
-                                                {{ $mahasiswa->pengguna->username }}</div>
+                                                {{ $mahasiswa->pengguna->username }}
+                                            </div>
                                             <p class="text-xs text-gray-500 mt-1">Username tidak dapat diubah (mengikuti
                                                 NIM)</p>
                                         </div>
@@ -814,15 +742,10 @@
                                     </div>
                                 </div>
 
-                                <!-- Kontak -->
+                                <!-- Data Kontak -->
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-900 mb-4 flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
+                                        <i class="fas fa-address-book text-green-500 mr-2"></i>
                                         Data Kontak
                                     </h4>
                                     <div class="space-y-4">
@@ -831,7 +754,7 @@
                                             <label class="block text-xs font-medium text-gray-700 mb-2">Email</label>
                                             <input type="email" name="email" id="email"
                                                 value="{{ $mahasiswa->pengguna->email }}"
-                                                class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                                class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                                 placeholder="Contoh: john.doe@example.com" disabled>
                                         </div>
 
@@ -840,7 +763,7 @@
                                             <label class="block text-xs font-medium text-gray-700 mb-2">No HP</label>
                                             <input type="tel" name="no_hp" id="no_hp"
                                                 value="{{ $mahasiswa->pengguna->no_hp }}"
-                                                class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                                                class="form-input w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                                                 placeholder="Contoh: 081234567890" maxlength="20" disabled>
                                         </div>
                                     </div>
@@ -860,8 +783,7 @@
                                         <h4 class="text-sm font-medium text-yellow-800 mb-1">Reset Password</h4>
                                         <p class="text-xs text-yellow-700 mb-2">
                                             Untuk mereset password mahasiswa, gunakan tombol "Reset Password" di bagian atas
-                                            halaman.
-                                            Password akan direset sesuai dengan NIM yang aktif.
+                                            halaman. Password akan direset sesuai dengan NIM yang aktif.
                                         </p>
                                         <p class="text-xs text-yellow-700">
                                             <strong>Password saat ini:</strong> {{ $mahasiswa->nim }} (sesuai NIM)
@@ -876,11 +798,11 @@
                     <div id="form-actions"
                         class="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-200 flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 hidden">
                         <button type="button" onclick="cancelEditMode()"
-                            class="inline-flex items-center justify-center px-4 py-2 bg-white text-gray-700 text-xs font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors duration-200">
+                            class="inline-flex items-center justify-center px-4 py-2 bg-white text-gray-700 text-xs font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
                             Batal
                         </button>
                         <button type="submit"
-                            class="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors duration-200">
+                            class="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
                                 </path>
@@ -918,7 +840,7 @@
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Foto</label>
                         <input type="file" id="photo-input" name="photo" accept="image/*"
-                            class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
                         <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, JPEG. Maksimal: 2MB</p>
                     </div>
 
@@ -935,7 +857,7 @@
                             Batal
                         </button>
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                            class="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700">
                             Upload
                         </button>
                     </div>
@@ -988,6 +910,7 @@
             let programStudiData = [];
             let searchTimeout;
             let isEditMode = false;
+            let currentTab = 'data-utama';
 
             // Load data saat halaman dimuat
             document.addEventListener('DOMContentLoaded', function() {
@@ -996,46 +919,54 @@
                 setupMobileTabs();
                 setupCurrencyFormatting();
                 setupPhotoUpload();
+                initializeTab();
+            });
 
-                switchTab('data-utama');
+            // Utility functions for URL parameters
+            function getUrlParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            function updateUrlParameter(key, value) {
+                const url = new URL(window.location);
+                url.searchParams.set(key, value);
+                window.history.pushState({
+                    path: url.href
+                }, '', url.href);
+            }
+
+            function isValidTab(tabName) {
+                const validTabs = ['data-utama', 'data-pribadi', 'data-orangtua', 'data-wali', 'akun-pengguna'];
+                return validTabs.includes(tabName);
+            }
+
+            // Initialize tab based on URL query parameter
+            function initializeTab() {
+                const urlTab = getUrlParameter('tab');
+                const initialTab = urlTab && isValidTab(urlTab) ? urlTab : 'data-utama';
+                switchTab(initialTab);
+            }
+
+            // Handle browser back/forward navigation
+            window.addEventListener('popstate', function(event) {
+                const urlTab = getUrlParameter('tab');
+                const targetTab = urlTab && isValidTab(urlTab) ? urlTab : 'data-utama';
+                switchTabWithoutUrlUpdate(targetTab);
             });
 
             // Setup mobile tabs
             function setupMobileTabs() {
                 const mobileTabsContainer = document.getElementById('mobile-tabs');
-                const scrollLeft = document.getElementById('scroll-left');
-                const scrollRight = document.getElementById('scroll-right');
 
                 if (mobileTabsContainer) {
-                    // Update scroll indicators
                     function updateScrollIndicators() {
-                        const canScrollLeft = mobileTabsContainer.scrollLeft > 0;
-                        const canScrollRight = mobileTabsContainer.scrollLeft <
-                            (mobileTabsContainer.scrollWidth - mobileTabsContainer.clientWidth);
-
-                        if (scrollLeft) scrollLeft.style.opacity = canScrollLeft ? '1' : '0';
-                        if (scrollRight) scrollRight.style.opacity = canScrollRight ? '1' : '0';
+                        // Add scroll indicator logic if needed
                     }
 
                     mobileTabsContainer.addEventListener('scroll', updateScrollIndicators);
                     window.addEventListener('resize', updateScrollIndicators);
                     updateScrollIndicators();
-
-                    // Touch gestures for better mobile UX
-                    let startX = 0;
-                    let scrollLeftStart = 0;
-
-                    mobileTabsContainer.addEventListener('touchstart', function(e) {
-                        startX = e.touches[0].pageX;
-                        scrollLeftStart = this.scrollLeft;
-                    });
-
-                    mobileTabsContainer.addEventListener('touchmove', function(e) {
-                        e.preventDefault();
-                        const x = e.touches[0].pageX;
-                        const walk = (x - startX) * 2;
-                        this.scrollLeft = scrollLeftStart - walk;
-                    });
                 }
             }
 
@@ -1051,18 +982,20 @@
 
                     if (field) {
                         field.addEventListener('input', function() {
-                            const cursorPosition = this.selectionStart;
-                            const oldValue = this.value;
-                            const newValue = formatCurrencyInput(this.value);
-                            this.value = newValue;
+                            if (!this.disabled) {
+                                const cursorPosition = this.selectionStart;
+                                const oldValue = this.value;
+                                const newValue = formatCurrencyInput(this.value);
+                                this.value = newValue;
 
-                            // Adjust cursor position
-                            const diff = newValue.length - oldValue.length;
-                            this.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+                                // Adjust cursor position
+                                const diff = newValue.length - oldValue.length;
+                                this.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+                            }
                         });
 
                         field.addEventListener('blur', function() {
-                            if (this.value && !this.value.startsWith('Rp ')) {
+                            if (!this.disabled && this.value && !this.value.startsWith('Rp ')) {
                                 this.value = formatCurrency(this.value);
                             }
                         });
@@ -1070,40 +1003,29 @@
                 });
             }
 
-            // Format currency
+            // Format currency functions
             function formatCurrency(value) {
                 if (!value) return '';
-
-                // Remove non-numeric characters except dots and commas
-                let numStr = value.toString().replace(/[^\d,.-]/g, '');
-
-                // If it already starts with 'Rp', return as is
                 if (value.toString().startsWith('Rp ')) return value;
 
-                // If it's a pure number, format it
+                let numStr = value.toString().replace(/[^\d,.-]/g, '');
                 if (!isNaN(numStr.replace(/[,.]/g, ''))) {
                     const num = parseFloat(numStr.replace(/[,.]/g, ''));
                     if (num > 0) {
                         return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
                     }
                 }
-
-                // Return original value if can't format
                 return value;
             }
 
             function formatCurrencyInput(value) {
                 if (!value) return '';
 
-                // Remove 'Rp' and spaces
                 let numStr = value.replace(/Rp\s*/g, '').replace(/\./g, '');
-
-                // Remove non-numeric characters
                 numStr = numStr.replace(/[^\d]/g, '');
 
                 if (numStr === '') return '';
 
-                // Add thousands separator
                 const formatted = new Intl.NumberFormat('id-ID').format(parseInt(numStr));
                 return 'Rp ' + formatted;
             }
@@ -1139,7 +1061,7 @@
                 }
             }
 
-            // Photo upload functions
+            // Photo functions
             function openPhotoUpload() {
                 document.getElementById('photo-upload-modal').classList.remove('hidden');
             }
@@ -1154,7 +1076,6 @@
                 const form = document.getElementById('photo-upload-form');
                 const formData = new FormData(form);
 
-                // Show loading state
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalText = submitBtn.textContent;
                 submitBtn.textContent = 'Uploading...';
@@ -1170,8 +1091,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update avatar image
-                            location.reload(); // Simple approach - reload to show new image
+                            location.reload();
                         } else {
                             alert('Error uploading photo: ' + (data.message || 'Unknown error'));
                         }
@@ -1196,9 +1116,8 @@
                 const formInputs = document.querySelectorAll('.form-input');
 
                 if (isEditMode) {
-                    // Enable edit mode
                     toggleBtn.className =
-                        'inline-flex items-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200';
+                        'flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200';
                     toggleText.textContent = 'Mode Edit Aktif';
                     formActions.classList.remove('hidden');
                     formActions.classList.add('flex');
@@ -1208,15 +1127,12 @@
                         input.classList.remove('disabled:bg-gray-50', 'disabled:text-gray-500');
                     });
 
-                    // Enable program studi search button
                     const clearBtn = document.getElementById('clear_program_studi');
                     if (clearBtn) clearBtn.disabled = false;
-
                 } else {
-                    // Disable edit mode
                     toggleBtn.className =
-                        'inline-flex items-center px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200';
-                    toggleText.textContent = 'Ubah Data Mahasiswa';
+                        'flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200';
+                    toggleText.textContent = 'Ubah Data';
                     formActions.classList.add('hidden');
 
                     formInputs.forEach(input => {
@@ -1224,15 +1140,13 @@
                         input.classList.add('disabled:bg-gray-50', 'disabled:text-gray-500');
                     });
 
-                    // Disable program studi search button
                     const clearBtn = document.getElementById('clear_program_studi');
                     if (clearBtn) clearBtn.disabled = true;
                 }
             }
 
             function cancelEditMode() {
-                // Reset form to original values
-                location.reload(); // Simple approach - reload to reset all values
+                location.reload();
             }
 
             // Load program studi data
@@ -1274,8 +1188,16 @@
                     });
             }
 
-            // Tab switching functionality
+            // Enhanced tab switching with URL update
             function switchTab(tabName) {
+                updateUrlParameter('tab', tabName);
+                switchTabWithoutUrlUpdate(tabName);
+            }
+
+            // Tab switching without URL update
+            function switchTabWithoutUrlUpdate(tabName) {
+                currentTab = tabName;
+
                 // Hide all tab contents
                 const tabContents = document.querySelectorAll('.tab-content');
                 tabContents.forEach(content => {
@@ -1283,7 +1205,7 @@
                     content.classList.remove('active');
                 });
 
-                // Remove active class from all tab buttons (both mobile and desktop)
+                // Remove active class from all tab buttons
                 const tabButtons = document.querySelectorAll('.tab-button');
                 tabButtons.forEach(button => {
                     button.classList.remove('active', 'border-gray-900', 'text-gray-900');
@@ -1298,7 +1220,7 @@
                     selectedContent.classList.add('active');
                 }
 
-                // Add active class to selected tab buttons (both mobile and desktop)
+                // Add active class to selected tab buttons
                 const mobileButton = document.getElementById(`tab-${tabName}`);
                 const desktopButton = document.getElementById(`tab-${tabName}-desktop`);
 
@@ -1323,7 +1245,8 @@
             // Reset password function
             function resetPassword(mahasiswaId) {
                 if (confirm(
-                        'Yakin ingin mereset password mahasiswa ini?\n\nPassword akan direset sesuai dengan NIM yang aktif.')) {
+                        'Yakin ingin mereset password mahasiswa ini?\n\nPassword akan direset sesuai dengan NIM yang aktif.'
+                    )) {
                     const form = document.getElementById('reset-password-form');
                     form.action = `/mahasiswa/${mahasiswaId}/reset-password`;
                     form.submit();
@@ -1339,7 +1262,6 @@
 
                 if (!searchInput) return;
 
-                // Input event
                 searchInput.addEventListener('input', function() {
                     if (this.disabled) return;
 
@@ -1355,7 +1277,6 @@
                     }, 300);
                 });
 
-                // Focus event
                 searchInput.addEventListener('focus', function() {
                     if (this.disabled) return;
 
@@ -1368,14 +1289,12 @@
                     }
                 });
 
-                // Click outside to close
                 document.addEventListener('click', function(event) {
                     if (!searchInput.contains(event.target) && !dropdown.contains(event.target)) {
                         dropdown.classList.add('hidden');
                     }
                 });
 
-                // Initial clear button state
                 updateClearButton();
             }
 
@@ -1441,11 +1360,9 @@
                 updateClearButton();
                 dropdown.classList.add('hidden');
 
-                // Load kurikulum untuk program studi yang dipilih
                 const currentKurikulumId = document.getElementById('id_kurikulum').value;
                 loadKurikulumData(id, currentKurikulumId);
 
-                // Visual feedback
                 searchInput.classList.add('border-green-300', 'bg-green-50');
                 setTimeout(() => {
                     searchInput.classList.remove('border-green-300', 'bg-green-50');
@@ -1499,7 +1416,6 @@
                     if (!field || !field.value.trim()) {
                         e.preventDefault();
 
-                        // Switch to appropriate tab
                         if (['nim', 'nama', 'id_program_studi', 'id_kurikulum', 'angkatan', 'status_mahasiswa']
                             .includes(fieldName)) {
                             switchTab('data-utama');
@@ -1522,7 +1438,6 @@
                         alert(`${fieldName.toUpperCase()} harus 16 digit`);
                         field.focus();
 
-                        // Switch to appropriate tab
                         if (fieldName === 'nik') switchTab('data-pribadi');
                         else switchTab('data-orangtua');
 

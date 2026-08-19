@@ -11,7 +11,13 @@ return new class extends Migration
         Schema::create('kurikulum_mata_kuliah', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->integer('semester');
-            $table->enum('jenis_mata_kuliah', ['WAJIB', 'PILIHAN'])->default('wajib');
+
+            $table->enum('kategori_mata_kuliah', [
+                'MKWUUPT',   // Wajib UUPT
+                'MKWU',      // Wajib Universitas
+                'MKWPS',     // Wajib Program Studi
+                'MKP'        // Pilihan
+            ])->default('MKWPS');
 
             $table->uuid('id_kurikulum');
             $table->foreign('id_kurikulum')->references('id_kurikulum')->on('kurikulum')->onDelete('cascade');

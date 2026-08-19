@@ -17,6 +17,8 @@ class Mahasiswa extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'foto',
+
         'nim', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'angkatan',
         'nik', 'nisn', 'npwp', 'agama', 'kode_negara', 'kewarganegaraan', 'jalan',
         'dusun', 'rt', 'rw', 'kelurahan', 'kode_pos',

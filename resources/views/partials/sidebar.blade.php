@@ -66,7 +66,7 @@
                     <!-- Mobile Menu Button -->
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200">
-                        <i class="fa-solid fa-align-right text-lg"></i>
+                        <i class="fa-solid fa-bars text-lg"></i>
                     </button>
                 </div>
             </div>
@@ -100,10 +100,31 @@
                         class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                 {{ request()->is('dashboard*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
                         <span class="flex items-center justify-center w-5 h-5 mr-3">
-                            <i class="fa-solid fa-chart-simple"></i>
+                            <i class="fa-solid fa-home"></i>
                         </span>
                         <span>Dashboard</span>
                     </a>
+
+                    @role('mahasiswa')
+                        <a href="{{ route('mahasiswa.biodata.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                    {{ request()->is('mahasiswa/biodata*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+                            <span>Biodata</span>
+                        </a>
+                    @endrole
+                    @role('dosen')
+                        <a href="{{ route('dosen.biodata.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                    {{ request()->is('dosen/biodata*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+                            <span>Biodata</span>
+                        </a>
+                    @endrole
                 </div>
 
                 <!-- Informasi Umum - Universal untuk semua role -->
@@ -127,25 +148,6 @@
                         </span>
                         <span>Pengumuman</span>
                     </a>
-
-                    <a href=""
-                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
-   hover:bg-gray-50 hover:text-gray-900 font-medium">
-                        <span class="flex items-center justify-center w-5 h-5 mr-3">
-                            <i class="fa-solid fa-book"></i>
-                        </span>
-                        <span>E-Library</span>
-                    </a>
-
-                    <a href=""
-                        class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
-   hover:bg-gray-50 hover:text-gray-900 font-medium">
-                        <span class="flex items-center justify-center w-5 h-5 mr-3">
-                            <i class="fa-solid fa-newspaper"></i>
-                        </span>
-                        <span>E-Journal</span>
-                    </a>
-
                 </div>
 
                 <!-- Menu Khusus Admin -->
@@ -240,9 +242,9 @@
                             class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                 {{ request()->is('admin/akademik*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-search"></i>
+                                <i class="fa-solid fa-database"></i>
                             </span>
-                            <span>Data Akademik Mahasiswa</span>
+                            <span>Nilai Mahasiswa</span>
                         </a>
                     </div>
 
@@ -257,6 +259,33 @@
                                 <i class="fa-solid fa-chalkboard"></i>
                             </span>
                             <span>Kelas Perkuliahan</span>
+                        </a>
+
+                        <a href="{{ route('bimbingan.kkn.kelompok.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('bimbingan/kkn*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-users"></i>
+                            </span>
+                            <span>Bimbingan KKN</span>
+                        </a>
+
+                        <a href="{{ route('bimbingan.magang.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('bimbingan/magang*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </span>
+                            <span>Bimbingan Magang</span>
+                        </a>
+
+                        <a href="{{ route('bimbingan.skripsi.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('bimbingan/skripsi*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-book-open"></i>
+                            </span>
+                            <span>Bimbingan Skripsi</span>
                         </a>
                     </div>
                 @endhasrole
@@ -307,6 +336,15 @@
                             </span>
                             <span>Jadwal Kuliah</span>
                         </a>
+
+                        <a href="{{ route('mahasiswa.bimbingan.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('mahasiswa/bimbingan*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-comments"></i>
+                            </span>
+                            <span>Bimbingan Online</span>
+                        </a>
                     </div>
                 @endhasrole
 
@@ -320,7 +358,7 @@
                             class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
                             {{ request()->is('krs*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
                             <span class="flex items-center justify-center w-5 h-5 mr-3">
-                                <i class="fa-solid fa-clipboard-check"></i>
+                                <i class="fa-solid fa-check-circle"></i>
                             </span>
                             <span>Persetujuan KRS</span>
                         </a>
@@ -337,6 +375,15 @@
                                 <i class="fa-solid fa-chalkboard-teacher"></i>
                             </span>
                             <span>Jadwal Mengajar</span>
+                        </a>
+
+                        <a href="{{ route('dosen.bimbingan.index') }}"
+                            class="group flex items-center px-4 py-2 text-sm text-gray-700 rounded-xl transition-all duration-200 hover:no-underline relative
+                            {{ request()->is('dosen/bimbingan*') ? 'bg-gray-50 font-semibold shadow-sm' : ' hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                            <span class="flex items-center justify-center w-5 h-5 mr-3">
+                                <i class="fa-solid fa-user-friends"></i>
+                            </span>
+                            <span>Bimbingan Online</span>
                         </a>
                     </div>
                 @endhasrole
